@@ -11,8 +11,18 @@ commands:
     description: Administración de FoliaCustomCommands
     usage: /fccmds reload
     permission: fccmds.admin
+  enderchest:
+    description: Abre tu enderchest o el de otro jugador
+    usage: /enderchest [jugador]
+    permission: fccmds.enderchest
 
 permissions:
   fccmds.admin:
     description: Permite recargar la configuración del plugin
+    default: op
+  fccmds.enderchest:
+    description: Permite abrir tu propio enderchest con /enderchest
+    default: true
+  fccmds.enderchest.others:
+    description: Permite ver el enderchest de otros jugadores con /enderchest <jugador>
     default: op

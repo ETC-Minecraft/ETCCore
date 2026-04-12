@@ -1,5 +1,6 @@
 package dev.foliacmds;
 
+import dev.foliacmds.command.EnderChestCommand;
 import dev.foliacmds.command.ReloadCommand;
 import dev.foliacmds.manager.CommandManager;
 import dev.foliacmds.manager.CooldownManager;
@@ -39,6 +40,14 @@ public final class FoliaCustomCommands extends JavaPlugin {
         var fccCmd = getCommand("fccmds");
         if (fccCmd != null) {
             fccCmd.setExecutor(new ReloadCommand(this));
+        }
+
+        var ecCmd = getCommand("enderchest");
+        if (ecCmd != null) {
+            EnderChestCommand ec = new EnderChestCommand(this);
+            ecCmd.setExecutor(ec);
+            ecCmd.setTabCompleter(ec);
+            getServer().getPluginManager().registerEvents(ec, this);
         }
 
         getLogger().info("FoliaCustomCommands habilitado — "
