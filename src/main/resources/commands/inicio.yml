@@ -1,0 +1,56 @@
+# ============================================================
+#   FORMATO MÚLTIPLE — varios comandos en un solo archivo
+#   Útil para agrupar comandos relacionados.
+# ============================================================
+#
+# === REFERENCIA DE ACCIONES ===
+#   [CONSOLE]  [MESSAGE]  [BROADCAST]  [ACTIONBAR]
+#   [TITLE]  [TITLE:fadeIn:stay:fadeOut]
+#   [SOUND]  [SOUND:vol:pitch]
+#   [DELAY:ticks]  [CHANCE:0-100]  [IF condición]
+#
+# === CONDICIONES [IF] ===
+#   permission:nodo  !permission:nodo
+#   world:nombre     !world:nombre
+#   health>N         health<N
+#
+# === PLACEHOLDERS ===
+#   {player} {world} {x} {y} {z} {args} {arg0} {arg1}...
+# ============================================================
+
+commands:
+
+  inicio:
+    description: "Ir al spawn"
+    permission: ""
+    no-permission-message: "&cSin permiso."
+    console-allowed: false
+    cooldown: 30
+    cooldown-message: "&cEspera &e{remaining}s &cpara volver al inicio."
+    actions:
+      - "[TITLE] &aBienvenido;&7de vuelta, {player}"
+      - "[SOUND] ENTITY_PLAYER_LEVELUP"
+      - "[CONSOLE] spawn {player}"
+
+  dia:
+    description: "Poner el tiempo en día"
+    permission: "miserver.dia"
+    no-permission-message: "&cNo puedes cambiar el tiempo."
+    console-allowed: true
+    actions:
+      - "[CONSOLE] time set day"
+      - "[BROADCAST] &e{player} &7puso el tiempo en día."
+
+  vip:
+    description: "Info/beneficios VIP"
+    permission: ""
+    no-permission-message: ""
+    console-allowed: false
+    conditions:
+      worlds: [world]
+      worlds-message: "&cSolo disponible en el mundo survival."
+    actions:
+      - "[IF permission:miserver.vip] [MESSAGE] &6¡Hola, VIP {player}!"
+      - "[IF !permission:miserver.vip] [MESSAGE] &7Hola, {player}. &e¡Hazte VIP!"
+      - "[IF permission:miserver.vip] [CHANCE:10] [CONSOLE] give {player} diamond 1"
+      - "[DELAY:40] [MESSAGE] &8(Escribe /ayuda para ver los comandos)"

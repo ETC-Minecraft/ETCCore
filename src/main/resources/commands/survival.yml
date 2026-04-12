@@ -1,0 +1,17 @@
+# ============================================================
+#   FORMATO SIMPLE — un comando por archivo (/survival)
+# ============================================================
+
+description: "Teletransporte aleatorio al mundo survival"
+permission: ""
+no-permission-message: "&cNo tienes permiso para usar este comando."
+console-allowed: false
+
+# Cooldown en segundos (0 = sin cooldown)
+cooldown: 60
+cooldown-message: "&cEspera &e{remaining}s &cpara usar /survival de nuevo."
+
+actions:
+  - "[TITLE] &a¡Teletransportando!;&7Buscando zona segura..."
+  - "[SOUND] ENTITY_ENDERMAN_TELEPORT"
+  - "[CONSOLE] rtp {player} world server"

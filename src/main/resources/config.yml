@@ -1,0 +1,6 @@
+# ============================================================
+#   FoliaCustomCommands — config.yml
+# ============================================================
+#
+# Muestra logs al registrar/desregistrar comandos (default: false)
+verbose-outputs: false
