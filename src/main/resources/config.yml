@@ -4,3 +4,6 @@
 #
 # Muestra logs al registrar/desregistrar comandos (default: false)
 verbose-outputs: false
+
+# Recarga automáticamente los archivos de commands/ cuando detecta cambios (default: true)
+auto-reload: true
