@@ -1,0 +1,82 @@
+name: "🐛 Bug Report"
+description: Reporta un error o comportamiento inesperado en ETCCore
+title: "[BUG] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por tomarte el tiempo de reportar un bug.
+        Completa todos los campos — sin información suficiente el issue puede cerrarse.
+
+  - type: input
+    id: etccore-version
+    attributes:
+      label: Versión de ETCCore
+      placeholder: "1.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: server-version
+    attributes:
+      label: Versión del servidor
+      placeholder: "Paper 1.21.4 build 123 / Folia 1.21.4 build 45"
+    validations:
+      required: true
+
+  - type: input
+    id: java-version
+    attributes:
+      label: Versión de Java
+      placeholder: "21.0.3"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Descripción del bug
+      description: Describe qué está ocurriendo de forma clara y concisa.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Pasos para reproducirlo
+      description: Pasos exactos para reproducir el problema.
+      placeholder: |
+        1. Crear un comando YAML con la acción [MENU] ...
+        2. Un jugador ejecuta /micomando
+        3. Se produce el error...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamiento esperado
+      description: ¿Qué debería haber pasado?
+    validations:
+      required: true
+
+  - type: textarea
+    id: yml
+    attributes:
+      label: YAML relevante (si aplica)
+      description: Pega el contenido de tu archivo .yml relacionado con el bug.
+      render: yaml
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / Stack trace
+      description: Pega el error del log del servidor (latest.log o similar).
+      render: text
+
+  - type: input
+    id: plugins
+    attributes:
+      label: Otros plugins instalados
+      placeholder: "LuckPerms, Vault, EssentialsX, PlaceholderAPI..."

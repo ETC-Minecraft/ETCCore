@@ -1,15 +1,18 @@
-name: FoliaCustomCommands
+name: ETCCore
 version: ${project.version}
 main: dev.foliacmds.FoliaCustomCommands
 api-version: "1.21"
 folia-supported: true
-description: Crea comandos personalizados desde config.yml, compatible 100% con Folia.
-author: TuNombre
+description: Plugin base para servidores Minecraft — comandos YAML, GUIs, variables, protección, mute y más.
+author: EmmanuelTC
+website: https://github.com/ETC-Minecraft/ETCCore
+soft-depend: [LuckPerms, PlaceholderAPI, Vault, floodgate]
 
 commands:
   fccmds:
-    description: Administración de FoliaCustomCommands
+    description: Administración de ETCCore
     usage: /fccmds <reload|onlinemode>
+    aliases: [etccore, ecc]
     permission: fccmds.admin
   enderchest:
     description: Abre tu enderchest o el de otro jugador
@@ -19,6 +22,14 @@ commands:
     description: Ve y edita el inventario de otro jugador (online u offline)
     usage: /invsee <jugador>
     permission: fccmds.invsee
+  mute:
+    description: Silencia a un jugador (temporal o permanente)
+    usage: /mute <jugador> [duración] [razón]
+    permission: fccmds.mute
+  unmute:
+    description: Quita el silencio a un jugador
+    usage: /unmute <jugador>
+    permission: fccmds.mute
 
 permissions:
   fccmds.admin:
@@ -41,5 +52,17 @@ permissions:
     default: op
   fccmds.build.bypass:
     description: Ignora completamente la protección de construcción (admins, staff).
+    default: op
+  fccmds.items:
+    description: Permite tirar y recoger ítems del suelo.
+    default: op
+  fccmds.chat:
+    description: Permite enviar mensajes al chat. Deniega con LP para silenciar por permiso.
+    default: true
+  fccmds.mute:
+    description: Permite silenciar y dessilenciar jugadores con /mute y /unmute.
+    default: op
+  fccmds.cmdblock.bypass:
+    description: Ignora todas las reglas de blocked-commands.yml (admins, staff).
     default: op
 

@@ -1,0 +1,28 @@
+# ============================================================
+#   Tarea programada de ejemplo — reset-diario.yml
+# ============================================================
+#
+# Esta tarea se ejecuta automáticamente cada X segundos en el servidor.
+# Para activarla cambia "enabled: false" a "enabled: true".
+#
+# Acciones disponibles en tareas globales:
+#   [BROADCAST] &aMensaje      — manda mensaje a todos los jugadores
+#   [CONSOLE] comando          — ejecuta un comando como consola
+#
+# NOTA: Acciones que requieren un jugador ([MESSAGE], [TITLE], [SOUND], etc.)
+#       no funcionan aquí porque no hay jugador asociado. Úsalas en comandos YAML normales.
+#
+# Recarga con: /fccmds reload
+# ============================================================
+
+# Activar/desactivar esta tarea sin borrar el archivo
+enabled: false
+
+# Intervalo en segundos entre cada ejecución.
+# Mínimo: 1 segundo (= 20 ticks).
+# Ejemplos:   60 = 1 minuto | 3600 = 1 hora | 86400 = 24 horas
+interval: 3600
+
+actions:
+  - "[BROADCAST] &8[&6Servidor&8] &eHa pasado una hora. &7¡Sigue jugando!"
+  - "[CONSOLE] save-all"

@@ -1,0 +1,24 @@
+# ============================================================
+#   playerdata/ — Carpeta de datos por jugador
+# ============================================================
+#
+# Esta carpeta es generada automáticamente por FoliaCustomCommands.
+# Aquí se guarda un archivo YAML por cada jugador que use variables
+# en los comandos personalizados del plugin.
+#
+# Nombre de archivo: <UUID del jugador>.yml
+#
+# Ejemplo de contenido (no edites manualmente a menos que sea necesario):
+#
+#   puntos: 120
+#   rango: Cometa
+#   mision_activa: recoletar_madera
+#
+# Las variables se crean/modifican desde las acciones de los comandos YAML:
+#
+#   [VAR:SET] puntos = 100
+#   [VAR:ADD] puntos = {var:puntos} + 50
+#   [VAR:DEL] rango
+#
+# Los archivos se crean la primera vez que un jugador usa [VAR:SET].
+# No se borran automáticamente cuando el jugador se va.

@@ -203,6 +203,8 @@ public class CustomCommand extends Command {
         for (String rawAction : actions) {
             processAction(sender, player, rawAction, args);
         }
+        // Log execution if CommandLogger is enabled
+        plugin.getCommandLogger().log(player, getName(), args);
         return true;
     }
 
@@ -413,6 +415,39 @@ public class CustomCommand extends Command {
             return;
         }
 
+        // [MONEY_GIVE:amount]  — gives money via Vault (requires Vault + economy plugin)
+        if (action.startsWith("[MONEY_GIVE:")) {
+            if (player == null) return;
+            int close = action.indexOf(']');
+            if (close < 0) return;
+            try {
+                double amount = Double.parseDouble(action.substring("[MONEY_GIVE:".length(), close));
+                plugin.getVaultManager().give(player, amount);
+            } catch (NumberFormatException e) {
+                plugin.getLogger().warning("[MONEY_GIVE] Cantidad inválida: " + rawAction);
+            }
+            return;
+        }
+
+        // [MONEY_TAKE:amount]  — takes money; has no effect if insufficient (use [IF money>=X] first)
+        if (action.startsWith("[MONEY_TAKE:")) {
+            if (player == null) return;
+            int close = action.indexOf(']');
+            if (close < 0) return;
+            try {
+                double amount = Double.parseDouble(action.substring("[MONEY_TAKE:".length(), close));
+                plugin.getVaultManager().take(player, amount);
+            } catch (NumberFormatException e) {
+                plugin.getLogger().warning("[MONEY_TAKE] Cantidad inválida: " + rawAction);
+            }
+            return;
+        }
+
+        // [CLOSE]  — closes the current inventory (used in menus)
+        if (action.startsWith("[CLOSE]")) {
+            return; // handled by MenuManager's click handler; no-op here
+        }
+
         // Sin prefijo → el jugador ejecuta el comando
         if (player != null) {
             player.getScheduler().execute(plugin,
@@ -447,6 +482,9 @@ public class CustomCommand extends Command {
                 double hp = Double.parseDouble(condition.substring("health<".length()));
                 result = player != null && player.getHealth() < hp;
             } catch (NumberFormatException e) { result = false; }
+        } else if (condition.startsWith("money")) {
+            // money>=X, money<=X, money>X, money<X  (requires Vault)
+            result = evalMoneyCondition(condition, player);
         } else if (condition.startsWith("var:")) {
             result = evalVarCondition(condition.substring("var:".length()), player);
         } else {
@@ -455,6 +493,30 @@ public class CustomCommand extends Command {
         }
 
         return negate != result; // XOR para negación
+    }
+
+    /** Evaluates Vault economy conditions: money>=X, money<=X, money>X, money<X */
+    private boolean evalMoneyCondition(String condition, Player player) {
+        if (player == null) return false;
+        var vault = plugin.getVaultManager();
+        if (!vault.isEnabled()) return false;
+        double balance = vault.getBalance(player);
+        try {
+            if (condition.contains(">=")) {
+                return balance >= Double.parseDouble(condition.split(">=", 2)[1].trim());
+            } else if (condition.contains("<=")) {
+                return balance <= Double.parseDouble(condition.split("<=", 2)[1].trim());
+            } else if (condition.contains(">")) {
+                return balance > Double.parseDouble(condition.split(">", 2)[1].trim());
+            } else if (condition.contains("<")) {
+                return balance < Double.parseDouble(condition.split("<", 2)[1].trim());
+            } else if (condition.contains("=")) {
+                return balance == Double.parseDouble(condition.split("=", 2)[1].trim());
+            }
+        } catch (NumberFormatException e) {
+            plugin.getLogger().warning("[IF money] Valor inválido: " + condition);
+        }
+        return false;
     }
 
     /** Evalúa condiciones sobre variables: nombre=val, nombre!=val, nombre>N, nombre<N */
@@ -515,6 +577,13 @@ public class CustomCommand extends Command {
                 String varName = r.substring(idx + 5, end);
                 String varVal  = plugin.getPlayerDataManager().get(player.getUniqueId(), varName);
                 r = r.substring(0, idx) + varVal + r.substring(end + 1);
+            }
+
+            // Vault balance placeholders (requires Vault + economy plugin)
+            if (plugin.getVaultManager().isEnabled()) {
+                double bal = plugin.getVaultManager().getBalance(player);
+                r = r.replace("{balance}",     String.valueOf((long) bal));
+                r = r.replace("{balance_fmt}", plugin.getVaultManager().format(bal));
             }
 
             // PlaceholderAPI (solo si está instalado)

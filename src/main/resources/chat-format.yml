@@ -1,0 +1,43 @@
+# ============================================================
+#   FoliaCustomCommands — chat-format.yml
+# ============================================================
+#
+# Controla el aspecto de los mensajes de chat.
+# Se recarga con /fccmds reload.
+#
+# ── Placeholders disponibles ────────────────────────────────
+#
+#   {prefix}   — Prefijo LuckPerms del jugador  (incluye colores)
+#   {player}   — Nombre del jugador
+#   {suffix}   — Sufijo LuckPerms del jugador   (incluye colores)
+#   {message}  — Mensaje escrito
+#   {world}    — Nombre interno del mundo (p.ej. "world_nether")
+#   %...%      — Cualquier placeholder de PlaceholderAPI (si está instalado)
+#
+# ── Ejemplos ────────────────────────────────────────────────
+#
+#   Estándar con prefix/suffix LP:
+#     format: "{prefix}{player}{suffix}&7: &f{message}"
+#
+#   Con mundo antes del prefix:
+#     format: "&8[&7{world}&8] {prefix}{player}{suffix}&7: &f{message}"
+#
+#   Con %world_name_<world>% (requiere WorldName o similar en PAPI):
+#     format: "%worldname_{world}% {prefix}{player}{suffix}&7: &f{message}"
+#
+#   Con rango de puntos (variable del plugin):
+#     format: "{prefix}{player}{suffix} &8(&e{world}&8)&7: {message}"
+#
+#   Con saldo de Vault vía PAPI (requiere Vault + EconomyPlugin + PAPI):
+#     format: "{prefix}{player}{suffix} &8[&6$%vault_balance_formatted%&8]&7: {message}"
+#
+#   Con TPS del servidor (requiere ServerUtils o Spark en PAPI):
+#     format: "&8[&aTPS:%server_tps_1%&8] {prefix}{player}{suffix}&7: {message}"
+#
+# ── Tip ────────────────────────────────────────────────────
+#   Los placeholders %...% de PAPI se procesan CON el contexto del jugador,
+#   por lo que funcionan cosas como %player_health%, %luckperms_prefix%, etc.
+#   (aunque {prefix}/{suffix} ya los toma directamente de LP sin necesitar PAPI)
+#
+
+format: "{prefix}{player}{suffix}&7: &f{message}"

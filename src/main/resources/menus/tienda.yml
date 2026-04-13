@@ -1,0 +1,187 @@
+# ============================================================
+#   Menú de ejemplo — tienda.yml
+# ============================================================
+#
+# Tienda de puntos del servidor.
+# Ábrase con:  [MENU] tienda
+#
+# Variables usadas:
+#   {var:puntos}  — puntos del jugador (ver vars en CustomCommand)
+#
+# Permiso:
+#   permission: fccmds.menus.tienda   (vacío = todos pueden abrir)
+#
+# Los jugadores acumulan puntos con comandos YAML que usen:
+#   [VAR:ADD] puntos 10
+#
+# Recarga:  /fccmds reload
+# ============================================================
+
+title: "&2&l💰 Tienda de puntos"
+rows: 4
+permission: "fccmds.menus.tienda"
+
+items:
+
+  # ── Borde (verde) ─────────────────────────────────────────
+  0:  { material: GREEN_STAINED_GLASS_PANE, name: " " }
+  1:  { material: GREEN_STAINED_GLASS_PANE, name: " " }
+  2:  { material: GREEN_STAINED_GLASS_PANE, name: " " }
+  3:  { material: GREEN_STAINED_GLASS_PANE, name: " " }
+  5:  { material: GREEN_STAINED_GLASS_PANE, name: " " }
+  6:  { material: GREEN_STAINED_GLASS_PANE, name: " " }
+  7:  { material: GREEN_STAINED_GLASS_PANE, name: " " }
+  8:  { material: GREEN_STAINED_GLASS_PANE, name: " " }
+  9:  { material: GREEN_STAINED_GLASS_PANE, name: " " }
+  17: { material: GREEN_STAINED_GLASS_PANE, name: " " }
+  18: { material: GREEN_STAINED_GLASS_PANE, name: " " }
+  26: { material: GREEN_STAINED_GLASS_PANE, name: " " }
+  27: { material: GREEN_STAINED_GLASS_PANE, name: " " }
+  28: { material: GREEN_STAINED_GLASS_PANE, name: " " }
+  29: { material: GREEN_STAINED_GLASS_PANE, name: " " }
+  31: { material: GREEN_STAINED_GLASS_PANE, name: " " }
+  32: { material: GREEN_STAINED_GLASS_PANE, name: " " }
+  33: { material: GREEN_STAINED_GLASS_PANE, name: " " }
+  34: { material: GREEN_STAINED_GLASS_PANE, name: " " }
+
+  # Slot 4 — Saldo informativo (anula borde superior)
+  4:
+    material: GOLD_NUGGET
+    name: "&6Tu saldo"
+    lore:
+      - "&7Puntos disponibles:"
+      - "&e{var:puntos} puntos"
+      - ""
+      - "&8Los puntos se ganan"
+      - "&8completando actividades."
+    glow: true
+
+  # ══════════════════════════════════════════════════════════
+  #  PRODUCTOS
+  #  Patrón de compra:
+  #    1. Si NO tiene suficiente → aviso (antes de cualquier SET)
+  #    2. Si SÍ tiene suficiente → deducir
+  #    3. Verificar saldo >= 0   → dar item / mensaje éxito
+  # ══════════════════════════════════════════════════════════
+
+  # Slot 10 — 3 Diamantes (50 puntos)
+  10:
+    material: DIAMOND
+    name: "&b&l3 Diamantes"
+    lore:
+      - "&73 diamantes directamente"
+      - "&7a tu inventario."
+      - ""
+      - "&ePrecio: &a50 puntos"
+      - "&7Tu saldo: &e{var:puntos} puntos"
+      - ""
+      - "&aClick para comprar"
+    glow: false
+    close-on-click: false
+    actions:
+      - "[IF var:puntos<50] [MESSAGE] &cNo tienes suficientes puntos. Necesitas &e50&c, tienes &e{var:puntos}&c."
+      - "[IF var:puntos>=50] [VAR:SET] puntos = {var:puntos} - 50"
+      - "[IF var:puntos>=0] [CONSOLE] give {player} diamond 3"
+      - "[IF var:puntos>=0] [MESSAGE] &a¡Compra exitosa! Recibiste &b3 diamantes&a. Puntos restantes: &e{var:puntos}"
+
+  # Slot 12 — Manzana Dorada (30 puntos)
+  12:
+    material: GOLDEN_APPLE
+    name: "&e&lManzana Dorada"
+    lore:
+      - "&7Regeneración y absorción"
+      - "&7instantáneas."
+      - ""
+      - "&ePrecio: &a30 puntos"
+      - "&7Tu saldo: &e{var:puntos} puntos"
+      - ""
+      - "&aClick para comprar"
+    close-on-click: false
+    actions:
+      - "[IF var:puntos<30] [MESSAGE] &cNo tienes suficientes puntos. Necesitas &e30&c, tienes &e{var:puntos}&c."
+      - "[IF var:puntos>=30] [VAR:SET] puntos = {var:puntos} - 30"
+      - "[IF var:puntos>=0] [CONSOLE] give {player} golden_apple 1"
+      - "[IF var:puntos>=0] [MESSAGE] &a¡Compra exitosa! Recibiste &e1 manzana dorada&a. Puntos restantes: &e{var:puntos}"
+
+  # Slot 14 — +500 XP (20 puntos)
+  14:
+    material: EXPERIENCE_BOTTLE
+    name: "&a&l+500 XP"
+    lore:
+      - "&7500 puntos de experiencia"
+      - "&7directamente en tu barra."
+      - ""
+      - "&ePrecio: &a20 puntos"
+      - "&7Tu saldo: &e{var:puntos} puntos"
+      - ""
+      - "&aClick para comprar"
+    close-on-click: false
+    actions:
+      - "[IF var:puntos<20] [MESSAGE] &cNo tienes suficientes puntos. Necesitas &e20&c, tienes &e{var:puntos}&c."
+      - "[IF var:puntos>=20] [VAR:SET] puntos = {var:puntos} - 20"
+      - "[IF var:puntos>=0] [CONSOLE] xp add {player} 500"
+      - "[IF var:puntos>=0] [MESSAGE] &a¡Compra exitosa! Recibiste &a+500 XP&a. Puntos restantes: &e{var:puntos}"
+
+  # Slot 20 — Tótem de Inmortalidad (150 puntos)
+  20:
+    material: TOTEM_OF_UNDYING
+    name: "&6&lTótem de Inmortalidad"
+    lore:
+      - "&7Te salva de la muerte"
+      - "&7una vez automáticamente."
+      - ""
+      - "&ePrecio: &a150 puntos"
+      - "&7Tu saldo: &e{var:puntos} puntos"
+      - ""
+      - "&aClick para comprar"
+    glow: true
+    close-on-click: false
+    actions:
+      - "[IF var:puntos<150] [MESSAGE] &cNo tienes suficientes puntos. Necesitas &e150&c, tienes &e{var:puntos}&c."
+      - "[IF var:puntos>=150] [VAR:SET] puntos = {var:puntos} - 150"
+      - "[IF var:puntos>=0] [CONSOLE] give {player} totem_of_undying 1"
+      - "[IF var:puntos>=0] [MESSAGE] &a¡Compra exitosa! Recibiste &6un tótem&a. Puntos restantes: &e{var:puntos}"
+
+  # Slot 22 — Rango VIP (500 puntos + LuckPerms)
+  # Requiere LuckPerms instalado en el servidor.
+  22:
+    material: NETHER_STAR
+    name: "&d&lRango VIP"
+    lore:
+      - "&7Obtén el rango &d&lVIP&7."
+      - "&7Acceso a comandos y"
+      - "&7ventajas exclusivas."
+      - ""
+      - "&ePrecio: &a500 puntos"
+      - "&7Tu saldo: &e{var:puntos} puntos"
+      - ""
+      - "&aClick para comprar"
+    glow: true
+    close-on-click: false
+    actions:
+      - "[IF var:puntos<500] [MESSAGE] &cNo tienes suficientes puntos. Necesitas &e500&c, tienes &e{var:puntos}&c."
+      - "[IF var:puntos>=500] [VAR:SET] puntos = {var:puntos} - 500"
+      - "[IF var:puntos>=0] [CONSOLE] lp user {player} parent set vip"
+      - "[IF var:puntos>=0] [MESSAGE] &a¡Felicitaciones! Ahora eres &d&lVIP&a. Puntos restantes: &e{var:puntos}"
+      - "[IF var:puntos>=0] [BROADCAST] &6¡&e{player} &6acaba de obtener el rango &d&lVIP&6!"
+      - "[IF var:puntos>=0] [TITLE:15:60:15] &d¡FELICITACIONES!;&aAhora eres &d&lVIP"
+
+  # ── Navegación ────────────────────────────────────────────
+
+  # Slot 30 — Volver al panel
+  30:
+    material: ARROW
+    name: "&cVolver"
+    lore:
+      - "&7Regresa al panel principal."
+    close-on-click: false
+    actions:
+      - "[MENU] panel"
+
+  # Slot 35 — Cerrar
+  35:
+    material: BARRIER
+    name: "&c&lCerrar"
+    close-on-click: true
+    actions:
+      - "[CLOSE]"

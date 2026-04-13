@@ -33,7 +33,11 @@ public class ReloadCommand implements CommandExecutor, TabCompleter {
                 plugin.getServer().getGlobalRegionScheduler().execute(plugin, () -> {
                     plugin.getCommandManager().reload();
                     plugin.getMenuManager().loadMenus();
-                    sender.sendMessage("§a[FCC] §fRecargado. §7("
+                    plugin.getCommandBlockManager().reload();
+                    plugin.getChatProtectionListener().reload();
+                    plugin.getCommandLogger().reload();
+                    plugin.getScheduledTaskManager().reload();
+                    sender.sendMessage("§a[ETCCore] §fRecargado. §7("
                             + plugin.getCommandManager().getCommandCount() + " cmd, "
                             + plugin.getMenuManager().getMenuNames().size() + " menús)");
                 });

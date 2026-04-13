@@ -1,0 +1,64 @@
+name: "✨ Feature Request"
+description: Propone una nueva funcionalidad o mejora para ETCCore
+title: "[FEATURE] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ¿Tienes una idea para mejorar ETCCore? ¡Genial!
+        Describe tu propuesta con el mayor detalle posible.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Categoría
+      options:
+        - Nueva acción (ej. [MONEY_GIVE], [TITLE], etc.)
+        - Nueva condición [IF]
+        - Nuevo placeholder
+        - Sistema de permisos
+        - Sistema de GUIs / menús
+        - Integración con otro plugin (Vault, PAPI, etc.)
+        - Rendimiento / optimización
+        - Otro
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Resumen de la funcionalidad
+      description: Describe en una o dos oraciones qué propones.
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: ¿Por qué sería útil?
+      description: ¿Qué problema resuelve? ¿En qué casos lo usarías?
+    validations:
+      required: true
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Ejemplo de uso (YAML si aplica)
+      description: Muestra cómo quedaría la sintaxis o configuración que propones.
+      render: yaml
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas consideradas
+      description: ¿Hay alguna forma de lograr esto hoy con el plugin? ¿Por qué no es suficiente?
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: Busqué en los issues existentes y no encontré una propuesta igual
+          required: true
+        - label: Esta funcionalidad sería útil para otros proyectos, no solo el mío

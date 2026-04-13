@@ -1,0 +1,71 @@
+# ============================================================
+#   FoliaCustomCommands — blocked-commands.yml
+# ============================================================
+#
+# Sistema de bloqueo de comandos por grupo LuckPerms.
+# Los jugadores bloqueados no pueden ejecutar el comando NI verlo en el tab.
+#
+# Requiere LuckPerms instalado para la comprobación de grupos.
+#
+# ── Wildcards ──────────────────────────────────────────────────────────────
+#   "tp*"  → bloquea tp, tpa, tpaccept, tpdeny, tphere, tpahere...
+#   "gm*"  → bloquea gamemode, gm, gmc, gms, gmsp, gmsa...
+#
+# ── Bypass ─────────────────────────────────────────────────────────────────
+# Los jugadores con el permiso fccmds.cmdblock.bypass (default: op) ignoran
+# todas las reglas de bloqueo.
+#
+# ── Formato ────────────────────────────────────────────────────────────────
+# rules:
+#   - commands: [cmd1, cmd2]    ← lista de comandos (sin / o con /)
+#     groups:   [grupo1, grupo2] ← grupos LP a los que se aplica el bloqueo
+#     message:  "&cMensaje..."   ← opcional, si no se pone usa default-message
+
+# ── Global ─────────────────────────────────────────────────────────────────
+default-message: "&cNo tienes permiso para usar ese comando."
+
+# ── Reglas ─────────────────────────────────────────────────────────────────
+rules:
+
+  # Bloquear cambio de modo de juego a jugadores sin aprobar
+  - commands:
+      - gamemode
+      - gm
+      - gmc
+      - gms
+      - gmsp
+    groups:
+      - nebulosa
+      - cometa
+    message: "&cNecesitas ser aprobado para cambiar el modo de juego."
+
+  # Bloquear comandos de teletransporte
+  - commands:
+      - tp
+      - tpa
+      - tpaccept
+      - tpdeny
+      - tphere
+      - tpahere
+    groups:
+      - nebulosa
+    message: "&cNecesitas ser aprobado para teletransportarte."
+
+  # Bloquear comandos administrativos a rangos no-staff
+  # (Usa wildcard: "op" cubre tanto "/op" como si hubiera variantes)
+  - commands:
+      - op
+      - deop
+      - stop
+      - restart
+      - ban
+      - ban-ip
+    groups:
+      - nebulosa
+      - cometa
+      - asteroide
+      - pulsar
+      - quasar
+      - magnetar
+      - hipernova
+    message: "&c¡Acceso denegado!"

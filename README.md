@@ -1,4 +1,4 @@
-# FoliaCustomCommands
+﻿# FoliaCustomCommands
 
 Plugin nativo para **Folia / Paper** que permite crear comandos personalizados desde archivos YAML, menús de inventario GUI, variables por jugador, protección de construcción y más — sin necesidad de programar.
 
@@ -28,13 +28,18 @@ Plugin nativo para **Folia / Paper** que permite crear comandos personalizados d
 8. [Cooldown global](#cooldown-global)
 9. [Menús de inventario (GUIs)](#menús-de-inventario-guis)
 10. [Protección de construcción](#protección-de-construcción)
-11. [Permisos dinámicos para LuckPerms](#permisos-dinámicos-para-luckperms)
-12. [Comandos del plugin](#comandos-del-plugin)
-13. [Permisos](#permisos)
-14. [Comando `/enderchest`](#comando-enderchest)
-15. [Comando `/invsee`](#comando-invsee)
-16. [config.yml](#configyml)
-17. [Compilar](#compilar)
+11. [Protección de ítems](#protección-de-ítems)
+12. [Sistema de mute](#sistema-de-mute)
+13. [Bloqueo de comandos por grupo](#bloqueo-de-comandos-por-grupo)
+14. [Formato del chat](#formato-del-chat)
+15. [Permisos dinámicos para LuckPerms](#permisos-dinámicos-para-luckperms)
+16. [Comandos del plugin](#comandos-del-plugin)
+17. [Permisos](#permisos)
+18. [Comando `/enderchest`](#comando-enderchest)
+19. [Comando `/invsee`](#comando-invsee)
+20. [config.yml](#configyml)
+21. [Compilar](#compilar)
+22. [Licencia](#licencia)
 
 ---
 
@@ -521,6 +526,144 @@ Se activa en `config.yml` con `build-protection: true` (activo por defecto).
 
 ---
 
+## Protección de ítems
+
+Impide que jugadores sin permiso puedan **tirar ítems** de su inventario o **recoger ítems** del suelo. Se configura independientemente de la protección de construcción.
+
+Se activa con `item-protection: true` en `config.yml` (activo por defecto).
+
+| Nodo | Default | Descripción |
+|---|---|---|
+| `fccmds.items` | OP | Permite tirar y recoger ítems del suelo |
+| `fccmds.build.bypass` | OP | Incluye bypass de ítems además de construcción |
+
+**Comportamiento**:
+
+| Acción | Sin permiso | Con `fccmds.items` o `bypass` |
+|---|---|---|
+| Recoger ítem del suelo | Cancelado silenciosamente | Permitido |
+| Tirar ítem con Q | Cancelado + mensaje action bar | Permitido |
+| Modo espectador | Nunca bloqueado | Nunca bloqueado |
+
+---
+
+## Sistema de mute
+
+Silencia jugadores con tiempo y razón personalizados. Los mutes persisten entre reinicios en `plugins/FoliaCustomCommands/mutes.yml`.
+
+### Comandos
+
+```
+/mute <jugador>                     → Mute permanente con razón por defecto
+/mute <jugador> <duración>          → Mute temporal con razón por defecto
+/mute <jugador> <duración> <razón>  → Mute temporal con razón personalizada
+/mute <jugador> <razón...>          → Mute permanente con razón (sin duración)
+/unmute <jugador>                   → Quita el silencio
+```
+
+**Formatos de duración:**
+
+| Formato | Ejemplo | Duración |
+|---|---|---|
+| `Xs` | `30s` | 30 segundos |
+| `Xm` | `5m` | 5 minutos |
+| `Xh` | `2h` | 2 horas |
+| `Xd` | `7d` | 7 días |
+| `perm` | `perm` | Permanente (hasta `/unmute`) |
+
+**Ejemplos:**
+
+```bash
+/mute Steve                          # Permanente, razón por defecto
+/mute Steve 30m                      # 30 minutos
+/mute Steve 1d Spam en el chat       # 1 día, razón personalizada
+/unmute Steve
+```
+
+### Control por LP (`fccmds.chat`)
+
+Alternativa al `/mute` — deniega el nodo desde LuckPerms:
+
+```bash
+# Bloquear chat a un jugador:
+/lp user Steve permission set fccmds.chat false
+
+# Bloquear todo un grupo:
+/lp group nebulosa permission set fccmds.chat false
+```
+
+---
+
+## Bloqueo de comandos por grupo
+
+Bloquea comandos del servidor a grupos específicos de LuckPerms. Los jugadores bloqueados no pueden ejecutar el comando **ni verlo al presionar Tab**.
+
+La configuración vive en `plugins/FoliaCustomCommands/blocked-commands.yml`.
+
+> Requiere **LuckPerms** instalado.
+
+### Formato de `blocked-commands.yml`
+
+```yaml
+# Mensaje por defecto cuando se bloquea un comando
+default-message: "&cNo tienes permiso para usar ese comando."
+
+rules:
+  - commands:
+      - gamemode
+      - gm
+    groups:
+      - nebulosa
+      - cometa
+    message: "&cNecesitas ser aprobado para cambiar el modo de juego."
+
+  - commands:
+      - "tp*"      # wildcard: tp, tpa, tpaccept, tpaccept...
+      - "gm*"      # gamemode, gmc, gms, gmsp...
+    groups:
+      - nebulosa
+```
+
+### Bypass
+
+Los jugadores con `fccmds.cmdblock.bypass` (default: OP) saltan todas las reglas.
+
+```bash
+/lp group staff permission set fccmds.cmdblock.bypass true
+```
+
+---
+
+## Formato del chat
+
+Personaliza el formato del chat en `plugins/FoliaCustomCommands/chat-format.yml`. Requiere **LuckPerms** para los placeholders de prefijo/sufijo.
+
+```yaml
+# chat-format.yml
+format: "{prefix}{player}{suffix}&7: &f{message}"
+```
+
+| Placeholder | Valor |
+|---|---|
+| `{prefix}` | Prefijo LP del jugador |
+| `{player}` | Nombre del jugador |
+| `{suffix}` | Sufijo LP del jugador |
+| `{world}` | Mundo actual |
+| `{message}` | Mensaje escrito |
+| `%papi%` | Expande todos los placeholders de PlaceholderAPI en el mensaje |
+
+**Setup con LuckPerms:**
+
+```bash
+# Asignar prefijo al grupo:
+/lp group vip meta setprefix "&6[VIP] "
+/lp group admin meta setprefix "&c[Admin] "
+```
+
+> Si LuckPerms no está instalado, Paper usa su formato por defecto sin errores.
+
+---
+
 ## Permisos dinámicos para LuckPerms
 
 Al cargar comandos y menús, el plugin registra automáticamente nodos en Bukkit:
@@ -552,6 +695,8 @@ Al hacer `/fccmds reload`, los nodos de comandos eliminados se desregistran y lo
 | `/fccmds reload` | `fccmds.admin` | Recarga todos los archivos de `commands/` y `menus/` |
 | `/fccmds onlinemode` | `fccmds.admin` | Muestra el estado actual de online-mode |
 | `/fccmds onlinemode <true\|false>` | `fccmds.admin` | Cambia online-mode en caliente sin reiniciar |
+| `/mute <jugador> [tiempo] [razón]` | `fccmds.mute` | Silencia a un jugador (ver [Sistema de mute](#sistema-de-mute)) |
+| `/unmute <jugador>` | `fccmds.mute` | Quita el silencio a un jugador |
 | `/enderchest` | `fccmds.enderchest` | Abre tu propio enderchest |
 | `/enderchest <jugador>` | `fccmds.enderchest.others` | Abre el enderchest de otro jugador (online u offline) |
 | `/invsee <jugador>` | `fccmds.invsee` | Ve y edita el inventario completo de otro jugador |
@@ -579,8 +724,12 @@ Cambia el modo de autenticación **en tiempo de ejecución** sin hacer stop/star
 | `fccmds.enderchest.others` | OP | Ver/editar enderchest de otros jugadores |
 | `fccmds.invsee` | OP | Ver inventario de jugadores online |
 | `fccmds.invsee.offline` | OP | Ver/editar inventario de jugadores offline |
+| `fccmds.mute` | OP | Usar `/mute` y `/unmute` |
+| `fccmds.chat` | Todos | Permite enviar mensajes al chat. Deniega con LP para silenciar sin `/mute` |
 | `fccmds.build` | OP | Permite colocar y romper bloques |
-| `fccmds.build.bypass` | OP | Ignora completamente la protección de construcción |
+| `fccmds.build.bypass` | OP | Ignora completamente la protección de construcción e ítems |
+| `fccmds.items` | OP | Permite tirar y recoger ítems del suelo |
+| `fccmds.cmdblock.bypass` | OP | Ignora todas las reglas de bloqueo de comandos |
 | `fccmds.commands.<nombre>` | Todos | Auto-generado por cada comando YAML cargado |
 | `fccmds.menus.<nombre>` | Todos | Auto-generado por cada menú `.yml` cargado |
 
@@ -642,6 +791,22 @@ build-protection: true
 
 # Mensaje en la action bar cuando se bloquea al jugador. Admite &colores.
 build-protection-message: "&cNecesitas ser aprobado para construir o romper bloques."
+
+# ── Protección de ítems ────────────────────────────────────────────────────
+# true  = activo (bloquea tirar/recoger a jugadores sin fccmds.items)
+# false = desactivado
+item-protection: true
+
+# Mensaje en la action bar cuando el jugador intenta tirar un ítem sin permiso.
+item-protection-message: "&cNo puedes tirar objetos aquí."
+
+# ── Sistema de mute ────────────────────────────────────────────────────────
+# Razón que aparece cuando se usa /mute sin especificar una.
+mute-default-reason: "Violación de las normas del servidor"
+
+# ── Formato del chat ───────────────────────────────────────────────────────
+# Configurado en chat-format.yml (se crea automáticamente en la carpeta del plugin).
+# Requiere LuckPerms. Sin LP, Paper usa su formato por defecto.
 ```
 
 ---
@@ -652,745 +817,6 @@ Requisitos: Java 21+, Maven 3.8+
 
 ```bash
 git clone https://github.com/TU_USUARIO/FoliaCustomCommands.git
-cd FoliaCustomCommands
-mvn package
-```
-
-El `.jar` compilado estará en `target/FoliaCustomCommands-1.0.0.jar`.
-# FoliaCustomCommands
-
-Plugin nativo para **Folia / Paper** que permite crear comandos personalizados desde archivos YAML, menús de inventario, variables por jugador, protección de construcción y más — sin necesidad de programar.
-
-> **Compatible con**: Paper / Folia 1.21.1+  
-> **Java**: 21+
-
----
-
-## Tabla de contenidos
-
-1. [Instalación](#instalación)
-2. [Archivos de comandos](#archivos-de-comandos)
-   - [Formato simple](#formato-simple--un-comando-por-archivo)
-   - [Formato múltiple](#formato-múltiple--varios-comandos-en-un-archivo)
-3. [Todas las opciones de comando](#todas-las-opciones-de-comando)
-4. [Referencia de acciones](#referencia-de-acciones)
-   - [Acciones básicas](#acciones-básicas)
-   - [Condicionales `[IF]`](#condicionales-if)
-   - [Azar `[CHANCE]`](#azar-chance)
-   - [Retraso `[DELAY]`](#retraso-delay)
-   - [Variables `[VAR]`](#variables-var)
-   - [Input de chat `[INPUT]`](#input-de-chat-input)
-   - [Menús `[MENU]`](#menús-menu)
-5. [Placeholders](#placeholders)
-6. [PlaceholderAPI](#placeholderapi)
-7. [Args tipados y tab-complete](#args-tipados-y-tab-complete)
-8. [Cooldown global](#cooldown-global)
-9. [Menús de inventario (GUIs)](#menús-de-inventario-guis)
-10. [Comandos del plugin](#comandos-del-plugin)
-11. [Permisos](#permisos)
-12. [Comando `/enderchest`](#comando-enderchest)
-13. [Comando `/invsee`](#comando-invsee)
-14. [config.yml](#configyml)
-15. [Compilar](#compilar)
-16. [Licencia](#licencia)
-
----
-
-## Instalación
-
-1. Descarga o compila el `.jar` (ver [Compilar](#compilar))
-2. Colócalo en la carpeta `plugins/` de tu servidor
-3. Inicia el servidor — se creará `plugins/FoliaCustomCommands/commands/` con archivos de ejemplo
-4. Edita o crea archivos `.yml` en esa carpeta
-5. Usa `/fccmds reload` o deja que el auto-reload lo detecte solo
-
----
-
-## Archivos de comandos
-
-Los archivos `.yml` van en `plugins/FoliaCustomCommands/commands/`.  
-Hay dos formatos:
-
-### Formato simple — un comando por archivo
-
-El nombre del archivo (sin `.yml`) se convierte en el nombre del comando.
-
-**`commands/survival.yml`**
-```yaml
-description: "Teletransporte al mundo survival"
-permission: ""
-no-permission-message: "&cNo tienes permiso."
-console-allowed: false
-
-cooldown: 60
-cooldown-message: "&cEspera &e{remaining}s &cpara usar /survival de nuevo."
-
-actions:
-  - "[TITLE] &a¡Teletransportando!;&7Buscando zona segura..."
-  - "[SOUND] ENTITY_ENDERMAN_TELEPORT"
-  - "[CONSOLE] rtp {player} world_survival"
-```
-
----
-
-### Formato múltiple — varios comandos en un archivo
-
-Usa una sección `commands:`. Cada clave dentro se convierte en un comando.
-
-**`commands/inicio.yml`**
-```yaml
-commands:
-
-  inicio:
-    description: "Ir al spawn"
-    permission: ""
-    cooldown: 30
-    cooldown-message: "&cEspera &e{remaining}s."
-    actions:
-      - "[TITLE] &aBienvenido;&7de vuelta, {player}"
-      - "[SOUND] ENTITY_PLAYER_LEVELUP"
-      - "[CONSOLE] spawn {player}"
-
-  dia:
-    description: "Poner el tiempo en día"
-    permission: "miserver.dia"
-    console-allowed: true
-    actions:
-      - "[CONSOLE] time set day"
-      - "[BROADCAST] &e{player} &7puso el tiempo en día."
-```
-
----
-
-## Todas las opciones de comando
-
-| Opción | Por defecto | Descripción |
-|--------|-------------|-------------|
-| `description` | `""` | Descripción visible en `/help` |
-| `permission` | `""` | Nodo de permiso requerido (vacío = todos) |
-| `no-permission-message` | `""` | Mensaje cuando el jugador no tiene permiso |
-| `console-allowed` | `false` | ¿Puede la consola ejecutar este comando? |
-| `cooldown` | `0` | Cooldown **por jugador** en segundos (0 = deshabilitado) |
-| `global-cooldown` | `0` | Cooldown **global** en segundos — afecta a todos (0 = deshabilitado) |
-| `cooldown-message` | `""` | Mensaje durante cooldown. Usa `{remaining}` |
-| `aliases` | `[]` | Nombres alternativos del comando |
-| `conditions.worlds` | `[]` | Mundos donde el comando **sí** funciona (whitelist) |
-| `conditions.worlds-blacklist` | `[]` | Mundos donde el comando **no** funciona |
-| `conditions.worlds-message` | `""` | Mensaje cuando falla la condición de mundo |
-| `conditions.min-health` | `0` | Vida mínima requerida (en medios corazones) |
-| `conditions.health-message` | `""` | Mensaje cuando falla la condición de vida |
-| `arg-types` | `{}` | Tipos de argumentos para tab-complete por índice |
-
----
-
-## Referencia de acciones
-
-Las acciones son cadenas de texto en la lista `actions:`. Soportan prefijos encadenables.
-
-### Acciones básicas
-
-| Prefijo | Ejemplo | Descripción |
-|---------|---------|-------------|
-| *(sin prefijo)* o `[MESSAGE]` | `&aHola, {player}!` | Mensaje al jugador |
-| `[CONSOLE]` | `[CONSOLE] give {player} diamond 1` | Ejecuta un comando como consola |
-| `[BROADCAST]` | `[BROADCAST] &e{player} &7se unió!` | Mensaje a todos los jugadores |
-| `[ACTIONBAR]` | `[ACTIONBAR] &a¡Bienvenido!` | Texto en la barra de acción |
-| `[TITLE]` | `[TITLE] &aTítulo;&7Subtítulo` | Título en pantalla (`;` separa título y subtítulo) |
-| `[TITLE:fi:stay:fo]` | `[TITLE:10:60:10] &aHola` | Título con fade-in, duración y fade-out en ticks |
-| `[SOUND]` | `[SOUND] ENTITY_PLAYER_LEVELUP` | Reproduce un sonido |
-| `[SOUND:vol:pitch]` | `[SOUND:1.0:0.5] BLOCK_NOTE_BLOCK_PLING` | Sonido con volumen y pitch personalizados |
-| `[DELAY:ticks]` | `[DELAY:40] [MESSAGE] ¡Listo!` | Espera N ticks antes de ejecutar la acción |
-
----
-
-### Condicionales `[IF]`
-
-Ejecuta una acción solo si la condición es verdadera. Se puede combinar con cualquier otro prefijo.
-
-```yaml
-actions:
-  - "[IF permission:miserver.vip] [MESSAGE] &6¡Bienvenido, VIP!"
-  - "[IF !permission:miserver.vip] [MESSAGE] &7¡Hazte VIP para más beneficios!"
-  - "[IF world:world_nether] [BROADCAST] {player} entró al Nether."
-  - "[IF health>10] [MESSAGE] &aTienes suficiente vida."
-  - "[IF health<5] [MESSAGE] &c¡Salud baja!"
-  - "[IF var:puntos>100] [CONSOLE] lp user {player} permission set vip true"
-  - "[IF var:estado=activo] [MESSAGE] &aTu cuenta está activa."
-```
-
-| Condición | Descripción |
-|-----------|-------------|
-| `permission:nodo` | El jugador **tiene** el permiso |
-| `!permission:nodo` | El jugador **no tiene** el permiso |
-| `world:nombre` | El jugador **está** en ese mundo |
-| `!world:nombre` | El jugador **no está** en ese mundo |
-| `health>N` | La vida es **mayor** que N |
-| `health<N` | La vida es **menor** que N |
-| `var:nombre=valor` | La variable es **igual** al valor |
-| `var:nombre!=valor` | La variable es **distinta** |
-| `var:nombre>N` | La variable numérica es **mayor** que N |
-| `var:nombre<N` | La variable numérica es **menor** que N |
-| `var:nombre>=N` | La variable es **mayor o igual** que N |
-| `var:nombre<=N` | La variable es **menor o igual** que N |
-
----
-
-### Azar `[CHANCE]`
-
-Ejecuta una acción con probabilidad N% (0–100).
-
-```yaml
-actions:
-  - "[CHANCE:10] [CONSOLE] give {player} diamond 1"
-  - "[CHANCE:50] [MESSAGE] &a¡Tuviste suerte!"
-```
-
----
-
-### Retraso `[DELAY]`
-
-Espera N ticks antes de ejecutar la acción. 20 ticks = 1 segundo.
-
-```yaml
-actions:
-  - "[MESSAGE] &eProcesando..."
-  - "[DELAY:60] [MESSAGE] &a¡Terminado! (3 segundos después)"
-  - "[DELAY:100] [IF permission:admin] [CONSOLE] say {player} fue promovido"
-```
-
----
-
-### Variables `[VAR]`
-
-Guarda, modifica o elimina variables por jugador. Se guardan en `plugins/FoliaCustomCommands/playerdata/<uuid>.yml` y persisten entre sesiones.
-
-```yaml
-actions:
-  # Guardar un valor
-  - "[VAR:SET] puntos = 0"
-  - "[VAR:SET] estado = activo"
-
-  # Sumar al valor actual (soporta expresiones: + - * /)
-  - "[VAR:SET] puntos = {var:puntos} + 10"
-  - "[VAR:SET] vidas = {var:vidas} - 1"
-
-  # [VAR:ADD] es alias de SET con suma directa
-  - "[VAR:ADD] visitas = {var:visitas} + 1"
-
-  # Eliminar una variable
-  - "[VAR:DEL] estado"
-
-  # Mostrar el valor al jugador
-  - "[MESSAGE] &7Tienes §e{var:puntos} §7puntos."
-```
-
-Las variables del jugador también están disponibles como placeholder `{var:nombre}` en cualquier acción.
-
----
-
-### Input de chat `[INPUT]`
-
-Pide al jugador que escriba un valor en el chat. El mensaje se captura como variable y **no aparece en el chat** del servidor.
-
-```yaml
-actions:
-  - "[INPUT] destino;&e¿A qué mundo quieres ir?"
-  - "[DELAY:1] [IF var:destino!=] [CONSOLE] mv tp {player} {var:destino}"
-```
-
-Formato: `[INPUT] <variable>;<mensaje al jugador>`
-
-> La acción tras `[INPUT]` debe ir con `[DELAY]` para dar tiempo al jugador a escribir.
-
----
-
-### Menús `[MENU]`
-
-Abre un menú de inventario definido en `plugins/FoliaCustomCommands/menus/`.
-
-```yaml
-actions:
-  - "[MENU] principal"
-```
-
-Ver la sección [Menús de inventario (GUIs)](#menús-de-inventario-guis) para la definición completa.
-
----
-
-## Placeholders
-
-| Placeholder | Valor |
-|-------------|-------|
-| `{player}` | Nombre del jugador |
-| `{world}` | Nombre del mundo actual |
-| `{x}` | Coordenada X (bloque) |
-| `{y}` | Coordenada Y (bloque) |
-| `{z}` | Coordenada Z (bloque) |
-| `{args}` | Todos los argumentos del comando unidos por espacio |
-| `{arg0}`, `{arg1}`… | Argumentos individuales por índice |
-| `{var:nombre}` | Valor de una variable del jugador |
-
-Los colores usan `&` (ej. `&a` = verde, `&c` = rojo, `&e` = amarillo, `&6` = naranja).
-
----
-
-## PlaceholderAPI
-
-Si tienes **PlaceholderAPI** instalado, sus placeholders funcionan automáticamente en todas las acciones y textos:
-
-```yaml
-actions:
-  - "[MESSAGE] &7Tu dinero: &e%vault_balance%"
-  - "[MESSAGE] &7Rango: &b%luckperms_prefix%"
-  - "[IF var:puntos>{var:puntos}] [MESSAGE] ..."    # también combinables con vars
-```
-
-No requiere ninguna configuración extra — el plugin detecta PAPI automáticamente en runtime.
-
----
-
-## Args tipados y tab-complete
-
-Define los tipos de cada argumento para activar el tab-complete automático:
-
-```yaml
-# commands/kit.yml
-description: "Darle un kit a un jugador"
-permission: "miserver.kit"
-arg-types:
-  0: player    # el primer argumento completa con jugadores online
-  1: text      # texto libre (sin sugerencias)
-actions:
-  - "[CONSOLE] kit give {arg0} diamante"
-```
-
-| Tipo | Tab-complete |
-|------|-------------|
-| `player` | Jugadores online que coincidan con lo escrito |
-| `number` | Sin sugerencias (solo acepta números) |
-| `text` | Sin sugerencias (texto libre) |
-
----
-
-## Cooldown global
-
-El `global-cooldown` afecta a **todos los jugadores** simultáneamente. Útil para comandos de evento o de servidor que no deberían spamearse.
-
-```yaml
-# commands/evento.yml
-description: "Iniciar el evento del servidor"
-permission: "miserver.evento"
-global-cooldown: 300        # 5 minutos de espera para TODOS después de que alguien lo active
-cooldown-message: "&cEl evento se activó hace poco. Espera &e{remaining}s &cmás."
-actions:
-  - "[BROADCAST] &6¡EVENTO INICIADO por {player}!"
-  - "[CONSOLE] evento start"
-```
-
-> `cooldown` y `global-cooldown` son independientes y pueden usarse juntos.
-
----
-
-## Menús de inventario (GUIs)
-
-Los menús se definen en `plugins/FoliaCustomCommands/menus/`. Cada archivo `.yml` es un menú cuyo nombre es el nombre del archivo.
-
-**`menus/principal.yml`**
-```yaml
-title: "&8&lPanel principal"
-rows: 3                    # 1 a 6 filas (9 slots por fila)
-items:
-
-  13:                      # slot (0-based, izquierda a derecha, arriba a abajo)
-    material: COMPASS
-    name: "&aIr al spawn"
-    lore:
-      - "&7Haz clic para teleportarte"
-      - "&7al punto de spawn"
-    glow: true             # efecto de brillo sin enchant visible
-    close-on-click: true   # cierra el inventario al clicar (default: true)
-    actions:
-      - "[CONSOLE] spawn {player}"
-      - "[MESSAGE] &a¡Teletransportado!"
-
-  22:
-    material: BOOK
-    name: "&bMi perfil"
-    lore:
-      - "&7Puntos: &e{var:puntos}"
-    actions:
-      - "[MENU] perfil"   # abrir otro menú
-
-  26:
-    material: BARRIER
-    name: "&cCerrar"
-    actions:
-      - "[CLOSE]"         # cierra el inventario
-```
-
-### Opciones de ítem
-
-| Opción | Por defecto | Descripción |
-|--------|-------------|-------------|
-| `material` | `STONE` | Nombre del material (ver [lista de materiales](https://jd.papermc.io/paper/1.21/org/bukkit/Material.html)) |
-| `name` | `""` | Nombre del ítem (soporta `&colores` y `{var:x}`) |
-| `lore` | `[]` | Lista de líneas de descripción |
-| `glow` | `false` | Añade brillo sin mostrar enchantments |
-| `close-on-click` | `true` | Cierra el menú al hacer clic |
-| `custom-model-data` | `0` | Valor de CustomModelData para resource packs |
-| `actions` | `[]` | Acciones a ejecutar al clicar |
-
-### Abrir un menú desde un comando
-
-```yaml
-# commands/menu.yml
-description: "Abre el panel principal"
-permission: ""
-actions:
-  - "[MENU] principal"
-```
-
----
-
-## Comandos del plugin
-
-| Comando | Permiso | Descripción |
-|---------|---------|-------------|
-| `/fccmds reload` | `fccmds.admin` | Recarga todos los archivos de `commands/` |
-| `/enderchest` | `fccmds.enderchest` | Abre tu propio enderchest |
-| `/enderchest <jugador>` | `fccmds.enderchest.others` | Abre el enderchest de otro jugador |
-| `/invsee <jugador>` | `fccmds.invsee` | Ve y edita el inventario de otro jugador |
-
----
-
-## Permisos
-
-| Permiso | Por defecto | Descripción |
-|---------|-------------|-------------|
-| `fccmds.admin` | OP | Recargar con `/fccmds reload` |
-| `fccmds.enderchest` | Todos | Abrir tu propio enderchest |
-| `fccmds.enderchest.others` | OP | Ver/editar enderchest de otros |
-| `fccmds.invsee` | OP | Ver inventario de jugadores online |
-| `fccmds.invsee.offline` | OP | Ver/editar inventario de jugadores offline |
-
----
-
-## Comando `/enderchest`
-
-```
-/enderchest                  → Abre tu propio enderchest
-/enderchest <nombre>         → Abre el enderchest de otro jugador
-```
-
-| Situación | Qué hace |
-|-----------|----------|
-| Jugador **online** | Abre su enderchest en vivo. Los cambios se reflejan de inmediato. |
-| Jugador **offline** | Lee su `playerdata/<uuid>.dat`. Al cerrar, **guarda los cambios** automáticamente. |
-| Jugador offline que **se conecta** mientras tienes el chest abierto | Guardado cancelado para evitar conflictos. Se avisa al admin. |
-| Jugador que **no existe / nunca jugó** | Mensaje de error. |
-
----
-
-## Comando `/invsee`
-
-Ver y editar el inventario completo (36 slots + hotbar + armadura + offhand) de otro jugador.
-
-```
-/invsee <nombre>
-```
-
-El inventario se muestra en un cofre de 54 slots organizado así:
-
-| Slots en la vista | Contenido |
-|-------------------|-----------|
-| 0–26 | Inventario principal (filas 2, 3 y 4) |
-| 27–35 | Hotbar (fila 1) |
-| 36–39 | Armadura (botas, pantalones, peto, casco) |
-| 40 | Offhand |
-
-| Situación | Comportamiento |
-|-----------|---------------|
-| Jugador **online** | Vista en vivo, cambios inmediatos |
-| Jugador **offline** | Lee el `.dat`, guarda al cerrar |
-| Jugador offline se **conecta** mientras lo tienes abierto | Guardado cancelado, se avisa |
-
----
-
-## config.yml
-
-```yaml
-# Muestra logs al registrar/desactivar comandos (por defecto: false)
-verbose-outputs: false
-
-# Recarga automáticamente los archivos de commands/ cuando detecta cambios (por defecto: true)
-auto-reload: true
-```
-
----
-
-## Compilar
-
-Requisitos: Java 21+, Maven 3.8+
-
-```bash
-git clone https://github.com/YOUR_USERNAME/FoliaCustomCommands.git
-cd FoliaCustomCommands
-mvn package
-```
-
-El `.jar` compilado estará en `target/FoliaCustomCommands-1.0.0.jar`.
-
----
-
-## Licencia
-
-MIT
-
-
----
-
-## Instalación
-
-1. Descarga o compila el `.jar` (ver [Compilar](#compilar))
-2. Colócalo en la carpeta `plugins/` de tu servidor
-3. Inicia el servidor — se creará `plugins/FoliaCustomCommands/commands/` con archivos de ejemplo
-4. Edita o crea archivos `.yml` en esa carpeta
-5. Usa `/fccmds reload` o deja que el auto-reload lo detecte solo
-
----
-
-## Archivos de comandos
-
-Los archivos `.yml` van en `plugins/FoliaCustomCommands/commands/`.  
-Hay dos formatos:
-
-### Formato simple — un comando por archivo
-
-El nombre del archivo (sin `.yml`) se convierte en el nombre del comando.
-
-**`commands/survival.yml`**
-```yaml
-description: "Teletransporte al mundo survival"
-permission: ""
-no-permission-message: "&cNo tienes permiso."
-console-allowed: false
-
-cooldown: 60
-cooldown-message: "&cEspera &e{remaining}s &cpara usar /survival de nuevo."
-
-actions:
-  - "[TITLE] &a¡Teletransportando!;&7Buscando zona segura..."
-  - "[SOUND] ENTITY_ENDERMAN_TELEPORT"
-  - "[CONSOLE] rtp {player} world_survival"
-```
-
-Esto registra el comando `/survival`.
-
----
-
-### Formato múltiple — varios comandos en un archivo
-
-Usa una sección `commands:`. Cada clave dentro se convierte en un comando.
-
-**`commands/inicio.yml`**
-```yaml
-commands:
-
-  inicio:
-    description: "Ir al spawn"
-    permission: ""
-    cooldown: 30
-    cooldown-message: "&cEspera &e{remaining}s."
-    actions:
-      - "[TITLE] &aBienvenido;&7de vuelta, {player}"
-      - "[SOUND] ENTITY_PLAYER_LEVELUP"
-      - "[CONSOLE] spawn {player}"
-
-  dia:
-    description: "Poner el tiempo en día"
-    permission: "miserver.dia"
-    console-allowed: true
-    actions:
-      - "[CONSOLE] time set day"
-      - "[BROADCAST] &e{player} &7puso el tiempo en día."
-```
-
----
-
-## Todas las opciones
-
-| Opción | Por defecto | Descripción |
-|--------|-------------|-------------|
-| `description` | `""` | Descripción visible en `/help` |
-| `permission` | `""` | Nodo de permiso requerido (vacío = todos) |
-| `no-permission-message` | `""` | Mensaje cuando el jugador no tiene permiso |
-| `console-allowed` | `false` | ¿Puede la consola ejecutar este comando? |
-| `cooldown` | `0` | Cooldown en segundos (0 = deshabilitado) |
-| `cooldown-message` | `""` | Mensaje durante cooldown. Usa `{remaining}` |
-| `aliases` | `[]` | Nombres alternativos del comando |
-| `conditions.worlds` | `[]` | Mundos donde el comando **sí** funciona (whitelist) |
-| `conditions.worlds-blacklist` | `[]` | Mundos donde el comando **no** funciona |
-| `conditions.worlds-message` | `""` | Mensaje cuando falla la condición de mundo |
-| `conditions.min-health` | `0` | Vida mínima requerida (en medios corazones) |
-| `conditions.health-message` | `""` | Mensaje cuando falla la condición de vida |
-
----
-
-## Referencia de acciones
-
-Las acciones son cadenas de texto en la lista `actions:`. Soportan prefijos encadenables.
-
-### Acciones básicas
-
-| Prefijo | Ejemplo | Descripción |
-|---------|---------|-------------|
-| *(sin prefijo)* o `[MESSAGE]` | `&aHola, {player}!` | Mensaje al jugador |
-| `[CONSOLE]` | `[CONSOLE] give {player} diamond 1` | Ejecuta un comando como consola |
-| `[BROADCAST]` | `[BROADCAST] &e{player} &7se unió!` | Mensaje a todos los jugadores |
-| `[ACTIONBAR]` | `[ACTIONBAR] &aVida: {health}` | Texto en la barra de acción |
-| `[TITLE]` | `[TITLE] &aTítulo;&7Subtítulo` | Título en pantalla (`;` separa título y subtítulo) |
-| `[TITLE:fi:stay:fo]` | `[TITLE:10:60:10] &aHola` | Título con fade-in, duración y fade-out en ticks |
-| `[SOUND]` | `[SOUND] ENTITY_PLAYER_LEVELUP` | Reproduce un sonido (volumen y pitch por defecto) |
-| `[SOUND:vol:pitch]` | `[SOUND:1.0:0.5] BLOCK_NOTE_BLOCK_PLING` | Sonido con volumen y pitch personalizados |
-| `[DELAY:ticks]` | `[DELAY:40] [MESSAGE] ¡Listo!` | Espera N ticks antes de ejecutar la siguiente acción |
-
-> Los nombres de sonido usan el enum `Sound` de Bukkit (ej. `ENTITY_ENDERMAN_TELEPORT`, `BLOCK_NOTE_BLOCK_PLING`).
-
----
-
-### Condicionales `[IF]`
-
-Ejecuta una acción solo si la condición es verdadera. Se puede combinar con cualquier otro prefijo.
-
-```yaml
-actions:
-  - "[IF permission:miserver.vip] [MESSAGE] &6¡Bienvenido, VIP!"
-  - "[IF !permission:miserver.vip] [MESSAGE] &7¡Hazte VIP para más beneficios!"
-  - "[IF world:world_nether] [BROADCAST] {player} entró al Nether."
-  - "[IF health>10] [MESSAGE] &aTienes suficiente vida."
-  - "[IF health<5] [MESSAGE] &c¡Salud baja!"
-```
-
-| Condición | Descripción |
-|-----------|-------------|
-| `permission:nodo` | El jugador **tiene** el permiso |
-| `!permission:nodo` | El jugador **no tiene** el permiso |
-| `world:nombre` | El jugador **está** en ese mundo |
-| `!world:nombre` | El jugador **no está** en ese mundo |
-| `health>N` | La vida del jugador es **mayor** que N |
-| `health<N` | La vida del jugador es **menor** que N |
-
----
-
-### Azar `[CHANCE]`
-
-Ejecuta una acción con probabilidad N% (0–100).
-
-```yaml
-actions:
-  - "[CHANCE:10] [CONSOLE] give {player} diamond 1"
-  - "[CHANCE:50] [MESSAGE] &a¡Tuviste suerte!"
-  - "[CHANCE:100] [MESSAGE] Esto siempre aparece."
-```
-
----
-
-### Retraso `[DELAY]`
-
-Espera N ticks antes de ejecutar la acción. 20 ticks = 1 segundo.  
-Se puede combinar con cualquier prefijo, incluyendo `[IF]` y `[CHANCE]`.
-
-```yaml
-actions:
-  - "[MESSAGE] &eProcesando..."
-  - "[DELAY:60] [MESSAGE] &a¡Terminado! (3 segundos después)"
-  - "[DELAY:100] [IF permission:admin] [CONSOLE] say {player} fue promovido"
-```
-
----
-
-## Placeholders
-
-| Placeholder | Valor |
-|-------------|-------|
-| `{player}` | Nombre del jugador |
-| `{world}` | Nombre del mundo actual |
-| `{x}` | Coordenada X (bloque) |
-| `{y}` | Coordenada Y (bloque) |
-| `{z}` | Coordenada Z (bloque) |
-| `{args}` | Todos los argumentos del comando unidos por espacio |
-| `{arg0}`, `{arg1}`… | Argumentos individuales por índice |
-
-Los colores usan `&` (ej. `&a` = verde, `&c` = rojo, `&e` = amarillo, `&6` = naranja).
-
----
-
-## Comandos del plugin
-
-| Comando | Permiso | Descripción |
-|---------|---------|-------------|
-| `/fccmds reload` | `fccmds.admin` | Recarga todos los archivos de `commands/` |
-| `/enderchest` | `fccmds.enderchest` | Abre tu propio enderchest |
-| `/enderchest <jugador>` | `fccmds.enderchest.others` | Abre el enderchest de otro jugador (online u offline) |
-
----
-
-## Permisos
-
-| Permiso | Por defecto | Descripción |
-|---------|-------------|-------------|
-| `fccmds.admin` | OP | Permite recargar la configuración con `/fccmds reload` |
-| `fccmds.enderchest` | Todos | Permite abrir tu propio enderchest |
-| `fccmds.enderchest.others` | OP | Permite ver y editar el enderchest de otros jugadores |
-
----
-
-## Comando `/enderchest`
-
-Comando integrado en el plugin (no necesita archivo `.yml`).
-
-### Uso
-
-```
-/enderchest                  → Abre tu propio enderchest
-/enderchest <nombre>         → Abre el enderchest de otro jugador
-```
-
-### Comportamiento según el estado del jugador
-
-| Situación | Qué hace |
-|-----------|----------|
-| Jugador **online** | Abre su enderchest en vivo. Los cambios se reflejan de inmediato. |
-| Jugador **offline** | Lee su `playerdata/<uuid>.dat` y muestra el inventario. Al cerrar, **guarda los cambios** automáticamente. |
-| Jugador offline que **se conecta** mientras tienes el chest abierto | El guardado se **cancela** al cerrar para evitar sobrescribir su sesión activa. Se avisa al admin. |
-| Jugador que **no existe / nunca jugó** | Mensaje de error. No hace nada. |
-
-### Notas
-
-- El guardado offline es **completo**: preserva enchantments, nombre, lore y todos los componentes del ítem en 1.21+.
-- La escritura al `.dat` es **asíncrona** para no bloquear el hilo del servidor.
-- Los cambios al enderchest de un jugador **online** se guardan automáticamente cuando el jugador cierre sesión (comportamiento nativo de Minecraft).
-
----
-
-## config.yml
-
-```yaml
-# Muestra logs al registrar/desactivar comandos (por defecto: false)
-verbose-outputs: false
-
-# Recarga automáticamente los archivos de commands/ cuando detecta cambios (por defecto: true)
-auto-reload: true
-```
-
----
-
-## Compilar
-
-Requisitos: Java 21+, Maven 3.8+
-
-```bash
-git clone https://github.com/YOUR_USERNAME/FoliaCustomCommands.git
 cd FoliaCustomCommands
 mvn package
 ```

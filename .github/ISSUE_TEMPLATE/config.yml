@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 Documentación
+    url: https://etc-minecraft.github.io/ETCCore
+    about: Lee la documentación antes de abrir un issue
+  - name: 💬 Discord ETC-Minecraft
+    url: https://discord.gg/etc-minecraft
+    about: Preguntas de soporte general o configuración

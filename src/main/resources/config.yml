@@ -1,5 +1,5 @@
 # ============================================================
-#   FoliaCustomCommands — config.yml
+#   ETCCore — config.yml
 # ============================================================
 #
 # Muestra logs al registrar/desregistrar comandos (default: false)
@@ -7,6 +7,20 @@ verbose-outputs: false
 
 # Recarga automáticamente los archivos de commands/ cuando detecta cambios (default: true)
 auto-reload: true
+
+# ────────────────────────────
+# Update checker
+# ────────────────────────────
+# Verifica si hay una versión nueva en GitHub al iniciar el servidor.
+# Solo notifica a jugadores con fccmds.admin al unirse. Nunca molesta a jugadores normales.
+update-checker: true
+
+# ────────────────────────────
+# Logging de comandos
+# ────────────────────────────
+# Registra cada ejecución de un comando YAML en plugins/ETCCore/logs/commands.log
+# Útil para auditoría. Impacto mínimo (escritura asíncrona).
+log-commands: false
 
 # ────────────────────────────
 # Protección de construcción
@@ -19,3 +33,20 @@ build-protection: true
 # Mensaje que recibe el jugador cuando intenta construir sin permiso.
 # Soporta códigos de color &. Se muestra en la barra de acción (sobre el hotbar).
 build-protection-message: "&cNecesitas ser aprobado para construir o romper bloques."
+
+# ────────────────────────────
+# Protección de ítems
+# ────────────────────────────
+# Activa el sistema que bloquea tirar y recoger ítems a jugadores sin fccmds.items.
+item-protection: true
+
+# Mensaje en la action bar cuando el jugador intenta tirar un ítem sin permiso.
+item-protection-message: "&cNo puedes tirar objetos aquí."
+
+# ────────────────────────────
+# Sistema de mute
+# ────────────────────────────
+# Razón que se muestra cuando se usa /mute sin especificar una.
+mute-default-reason: "Violación de las normas del servidor"
+
+# El formato del chat se configura en chat-format.yml

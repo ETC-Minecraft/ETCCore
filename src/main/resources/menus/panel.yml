@@ -1,0 +1,175 @@
+# ============================================================
+#   Menú de ejemplo — panel.yml
+# ============================================================
+#
+# Panel de navegación principal del servidor.
+# Ábrase con:  [MENU] panel   (desde cualquier acción de comando YAML)
+#
+# Diseño (4 filas = 36 slots):
+#
+#   [ ][ ][ ][ ][ ][ ][ ][ ][ ]   ← fila 0: borde superior
+#   [ ] SP  ES  KIT TDA PER REG [ ]   ← fila 1: botones principales
+#   [ ] TKT          CER         [ ]   ← fila 2: ticket + cerrar
+#   [ ][ ][ ][ ][ ][ ][ ][ ][ ]   ← fila 3: borde inferior
+#
+# Recarga:  /fccmds reload
+# ============================================================
+
+title: "&8⬛ &6&lPANEL PRINCIPAL &8⬛"
+rows: 4
+
+items:
+
+  # ── Borde superior ────────────────────────────────────────
+  0:  { material: BLACK_STAINED_GLASS_PANE, name: " " }
+  1:  { material: BLACK_STAINED_GLASS_PANE, name: " " }
+  2:  { material: BLACK_STAINED_GLASS_PANE, name: " " }
+  3:  { material: BLACK_STAINED_GLASS_PANE, name: " " }
+  4:  { material: BLACK_STAINED_GLASS_PANE, name: " " }
+  5:  { material: BLACK_STAINED_GLASS_PANE, name: " " }
+  6:  { material: BLACK_STAINED_GLASS_PANE, name: " " }
+  7:  { material: BLACK_STAINED_GLASS_PANE, name: " " }
+  8:  { material: BLACK_STAINED_GLASS_PANE, name: " " }
+
+  # ── Laterales ─────────────────────────────────────────────
+  9:  { material: BLACK_STAINED_GLASS_PANE, name: " " }
+  17: { material: BLACK_STAINED_GLASS_PANE, name: " " }
+  18: { material: BLACK_STAINED_GLASS_PANE, name: " " }
+  26: { material: BLACK_STAINED_GLASS_PANE, name: " " }
+
+  # ── Borde inferior ────────────────────────────────────────
+  27: { material: BLACK_STAINED_GLASS_PANE, name: " " }
+  28: { material: BLACK_STAINED_GLASS_PANE, name: " " }
+  29: { material: BLACK_STAINED_GLASS_PANE, name: " " }
+  30: { material: BLACK_STAINED_GLASS_PANE, name: " " }
+  31: { material: BLACK_STAINED_GLASS_PANE, name: " " }
+  32: { material: BLACK_STAINED_GLASS_PANE, name: " " }
+  33: { material: BLACK_STAINED_GLASS_PANE, name: " " }
+  34: { material: BLACK_STAINED_GLASS_PANE, name: " " }
+  35: { material: BLACK_STAINED_GLASS_PANE, name: " " }
+
+  # ══════════════════════════════════════════════════════════
+  #  FILA 1 — Botones principales  (slots 10–16)
+  # ══════════════════════════════════════════════════════════
+
+  # Slot 10 — Ir al spawn
+  10:
+    material: COMPASS
+    name: "&aIr al spawn"
+    lore:
+      - "&7Teletranspórtate al punto"
+      - "&7de inicio del servidor."
+      - ""
+      - "&8Mundo actual: &7{world}"
+      - "&8Posición: &7{x}, {y}, {z}"
+    glow: true
+    close-on-click: true
+    actions:
+      - "[CONSOLE] spawn {player}"
+      - "[TITLE:10:50:10] &a¡Teletransportando!;&7Al spawn..."
+      - "[SOUND] ENTITY_ENDERMAN_TELEPORT"
+
+  # Slot 11 — Estadísticas
+  11:
+    material: BOOK
+    name: "&eMis estadísticas"
+    lore:
+      - "&7Mundo: &f{world}"
+      - "&7Posición: &f{x}&7, &f{y}&7, &f{z}"
+      - ""
+      - "&7Puntos: &e{var:puntos}"
+      - "&7Rango guardado: &6{var:rango}"
+    close-on-click: false
+    actions:
+      - "[MESSAGE] &7Estás en &f{world} &7— Coordenadas: &f{x}, {y}, {z}"
+
+  # Slot 12 — Kit diario
+  12:
+    material: CHEST
+    name: "&e&lKit Diario"
+    lore:
+      - "&7Recibe tu kit de recursos"
+      - "&7una vez cada &e24 horas&7."
+      - ""
+      - "&aClick para reclamar"
+    glow: true
+    close-on-click: true
+    actions:
+      - "[PLAYER] kit-diario"
+
+  # Slot 13 — Tienda
+  13:
+    material: EMERALD
+    name: "&a&lTienda"
+    lore:
+      - "&7Gasta tus puntos en"
+      - "&7recompensas y rangos."
+      - ""
+      - "&7Tus puntos: &e{var:puntos}"
+      - ""
+      - "&aClick para abrir"
+    glow: false
+    close-on-click: false
+    actions:
+      - "[MENU] tienda"
+
+  # Slot 14 — Mi perfil
+  14:
+    material: PLAYER_HEAD
+    name: "&b&lMi Perfil"
+    lore:
+      - "&7Jugador: &f{player}"
+      - "&7Rango: &6{var:rango}"
+      - "&7Puntos: &e{var:puntos}"
+      - ""
+      - "&aClick para ver detalles"
+    close-on-click: true
+    actions:
+      - "[PLAYER] mi-perfil"
+
+  # Slot 15 — Reglamento
+  15:
+    material: WRITABLE_BOOK
+    name: "&f&lReglamento"
+    lore:
+      - "&7Lee las normas del servidor"
+      - "&7antes de jugar."
+    close-on-click: true
+    actions:
+      - "[PLAYER] reglas"
+
+  # Slot 16 — Discord / Redes
+  16:
+    material: MAP
+    name: "&9&lDiscord & Redes"
+    lore:
+      - "&7discord.gg/miservidor"
+      - "&7instagram: @miservidor"
+    close-on-click: true
+    actions:
+      - "[MESSAGE] &9Discord: &fdiscord.gg/miservidor"
+      - "[MESSAGE] &dInstagram: &f@miservidor"
+
+  # ══════════════════════════════════════════════════════════
+  #  FILA 2  (slots 19–25)
+  # ══════════════════════════════════════════════════════════
+
+  # Slot 19 — Soporte / Ticket
+  19:
+    material: WRITABLE_BOOK
+    name: "&c&lAbrir Ticket"
+    lore:
+      - "&7¿Tienes un problema?"
+      - "&7Un staff te ayudará."
+    close-on-click: true
+    actions:
+      - "[PLAYER] ticket"
+
+  # Slot 22 — Cerrar (centro)
+  22:
+    material: BARRIER
+    name: "&c&lCerrar"
+    close-on-click: true
+    actions:
+      - "[CLOSE]"
+

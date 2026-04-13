@@ -86,9 +86,9 @@ public class MenuManager implements Listener {
         plugin.getLogger().info("Menús cargados: " + menus.size());
     }
 
-    // -------------------------------------------------------------------------
+    // ─────────────────────────────────────────────────────────────────────────
     // Apertura de un menú
-    // -------------------------------------------------------------------------
+    // ─────────────────────────────────────────────────────────────────────────
     public boolean openMenu(Player player, String name) {
         MenuDefinition def = menus.get(name.toLowerCase());
         if (def == null) return false;
@@ -100,6 +100,13 @@ public class MenuManager implements Listener {
             return false;
         }
 
+        // ── Geyser / Floodgate: send a native Bedrock form instead of a chest GUI ──
+        if (isBedrockPlayer(player)) {
+            openFloodgateForm(player, name, def);
+            return true;
+        }
+
+        // ── Java: standard inventory GUI ─────────────────────────────────────
         Inventory inv = Bukkit.createInventory(null, def.rows * 9,
                 LegacyComponentSerializer.legacyAmpersand().deserialize(def.title));
 
@@ -114,6 +121,93 @@ public class MenuManager implements Listener {
                 t -> player.openInventory(inv),
                 null);
         return true;
+    }
+
+    /**
+     * Returns true if the player is connected via Geyser/Floodgate (Bedrock Edition).
+     * Requires the Floodgate plugin; returns false if not installed.
+     */
+    private boolean isBedrockPlayer(Player player) {
+        if (Bukkit.getPluginManager().getPlugin("floodgate") == null) return false;
+        try {
+            Class<?> apiClass = Class.forName("org.geysermc.floodgate.api.FloodgateApi");
+            Object api = apiClass.getMethod("getInstance").invoke(null);
+            return (boolean) apiClass.getMethod("isFloodgatePlayer", java.util.UUID.class)
+                    .invoke(api, player.getUniqueId());
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
+    /**
+     * Opens a native Bedrock SimpleForm for Floodgate players.
+     * Buttons are generated from the menu items, in slot order.
+     * Clicking a button executes the corresponding item's actions.
+     */
+    private void openFloodgateForm(Player player, String menuName, MenuDefinition def) {
+        try {
+            // Collect buttons in slot order
+            java.util.List<MenuItem> buttons = def.items.entrySet().stream()
+                    .sorted(java.util.Map.Entry.comparingByKey())
+                    .map(java.util.Map.Entry::getValue)
+                    .filter(item -> !item.actions().isEmpty())
+                    .toList();
+
+            Class<?> formClass   = Class.forName("org.geysermc.floodgate.api.player.FloodgatePlayer");
+            Class<?> apiClass    = Class.forName("org.geysermc.floodgate.api.FloodgateApi");
+            Class<?> simpleForm  = Class.forName("org.geysermc.cumulus.form.SimpleForm");
+            Class<?> builderClass = Class.forName("org.geysermc.cumulus.form.SimpleForm$Builder");
+
+            Object builder = simpleForm.getMethod("builder").invoke(null);
+            // Strip color codes for Bedrock title
+            String cleanTitle = def.title().replaceAll("&[0-9a-fk-or]", "");
+            builderClass.getMethod("title", String.class).invoke(builder, cleanTitle);
+
+            for (MenuItem item : buttons) {
+                String label = LegacyComponentSerializer.legacyAmpersand()
+                        .serialize(net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+                                .legacyAmpersand().deserialize(item.name()))
+                        .replaceAll("\u00a7[0-9a-fk-or]", "");
+                builderClass.getMethod("button", String.class).invoke(builder, label);
+            }
+
+            // Response handler
+            java.util.List<MenuItem> finalButtons = buttons;
+            builderClass.getMethod("validResultHandler",
+                            java.util.function.BiConsumer.class)
+                    .invoke(builder, (java.util.function.BiConsumer<?, ?>) (form, response) -> {
+                        try {
+                            int idx = (int) response.getClass().getMethod("clickedButtonId")
+                                    .invoke(response);
+                            if (idx < 0 || idx >= finalButtons.size()) return;
+                            MenuItem item = finalButtons.get(idx);
+                            for (String action : item.actions()) {
+                                plugin.getCommandManager().dispatchAction(player, action, new String[0]);
+                            }
+                        } catch (Exception ignored) {}
+                    });
+
+            Object form = builderClass.getMethod("build").invoke(builder);
+            Object api  = apiClass.getMethod("getInstance").invoke(null);
+            apiClass.getMethod("sendForm",
+                    java.util.UUID.class, Class.forName("org.geysermc.cumulus.form.Form"))
+                    .invoke(api, player.getUniqueId(), form);
+
+        } catch (Exception e) {
+            // Floodgate API not available or incompatible version — fall back to chest GUI
+            plugin.getLogger().warning("[MenuManager] No se pudo abrir form Floodgate: "
+                    + e.getMessage() + ". Usando GUI de inventario.");
+            // Fallback: open chest inventory
+            Inventory inv = Bukkit.createInventory(null, def.rows * 9,
+                    LegacyComponentSerializer.legacyAmpersand().deserialize(def.title));
+            for (Map.Entry<Integer, MenuItem> entry : def.items.entrySet()) {
+                int slot = entry.getKey();
+                if (slot < 0 || slot >= def.rows * 9) continue;
+                inv.setItem(slot, buildItem(entry.getValue(), player));
+            }
+            openMenus.put(inv, new OpenMenu(player.getUniqueId(), menuName.toLowerCase()));
+            player.getScheduler().run(plugin, t -> player.openInventory(inv), null);
+        }
     }
 
     // -------------------------------------------------------------------------

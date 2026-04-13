@@ -1,0 +1,74 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*.*.*']
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── Build en todo push/PR ────────────────────────────────────────────────────
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build with Maven
+        run: mvn package -B
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ETCCore-snapshot
+          path: target/ETCCore-*.jar
+          retention-days: 7
+
+  # ── Release automático al hacer git tag v*.*.* ───────────────────────────────
+  release:
+    name: Create Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build with Maven (release)
+        run: mvn package -B -DskipTests
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "ETCCore v${{ steps.version.outputs.VERSION }}"
+          files: target/ETCCore-*.jar
+          generate_release_notes: true
+          body: |
+            ## ETCCore v${{ steps.version.outputs.VERSION }}
+
+            Descarga el JAR y colócalo en la carpeta `plugins/` de tu servidor.
+
+            **Requisitos:** Paper / Folia 1.21.1+ · Java 21+
+
+            Ver [CHANGELOG.md](https://github.com/ETC-Minecraft/ETCCore/blob/main/CHANGELOG.md) para detalles de cambios.
