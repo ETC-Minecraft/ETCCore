@@ -1,0 +1,92 @@
+# ============================================================
+#  EJEMPLO 01 — ACCIONES BÁSICAS
+#  Muestra cada tipo de acción de forma individual
+# ============================================================
+
+# ── 1. Solo mensaje al jugador ───────────────────────────────
+saludo:
+  name: saludo
+  permission: ""          # sin permiso = cualquiera puede usarlo
+  actions:
+    - "[MESSAGE] &aHola, &e{player}&a! Bienvenido al servidor."
+
+# ── 2. Mensaje con varias líneas ────────────────────────────
+info:
+  name: info
+  permission: ""
+  actions:
+    - "[MESSAGE] &8&m-----------------------------"
+    - "[MESSAGE] &6&lINFORMACIÓN DEL SERVIDOR"
+    - "[MESSAGE] &7IP: &fplay.miservidor.net"
+    - "[MESSAGE] &7Discord: &fdiscord.gg/miservidor"
+    - "[MESSAGE] &8&m-----------------------------"
+
+# ── 3. Ejecutar comando como el jugador ──────────────────────
+ir-spawn:
+  name: ir-spawn
+  permission: ""
+  actions:
+    - "[PLAYER] spawn"     # equivale a que el jugador escriba /spawn
+
+# ── 4. Ejecutar comando como consola (OP) ────────────────────
+curar:
+  name: curar
+  permission: fccmds.admin
+  actions:
+    - "[CONSOLE] heal {player}"   # cura al jugador que usó el comando
+
+# ── 5. Broadcast al servidor entero ──────────────────────────
+anuncio:
+  name: anuncio
+  permission: fccmds.admin
+  actions:
+    - "[BROADCAST] &c&lAVISO &8» &f{player} ha hecho un anuncio."
+
+# ── 6. Barra de acción (texto encima del hotbar) ─────────────
+puntos-bar:
+  name: puntos-bar
+  permission: ""
+  actions:
+    - "[ACTIONBAR] &eTus puntos: &a100 &7| &eTu rango: &6VIP"
+
+# ── 7. Título + subtítulo (tiempos por defecto) ──────────────
+bienvenida-titulo:
+  name: bienvenida-titulo
+  permission: ""
+  actions:
+    - "[TITLE] &6&lBIENVENIDO;&eTe alegra verte de nuevo."
+    # formato: [TITLE] título;subtítulo
+
+# ── 8. Título con tiempos personalizados (fadeIn;stay;fadeOut en ticks) ──
+titulo-largo:
+  name: titulo-largo
+  permission: ""
+  actions:
+    - "[TITLE] &b&lEVENTO ACTIVO;&7Doble XP hasta las 20:00;10;80;10"
+    # 10 ticks fade in, 80 ticks visible (~4 seg), 10 ticks fade out
+
+# ── 9. Sonido por defecto (vol 1.0, pitch 1.0) ───────────────
+ding:
+  name: ding
+  permission: ""
+  actions:
+    - "[SOUND] ENTITY_PLAYER_LEVELUP"
+
+# ── 10. Sonido con volumen y pitch personalizados ─────────────
+ding-personalizado:
+  name: ding-personalizado
+  permission: ""
+  actions:
+    - "[SOUND] BLOCK_NOTE_BLOCK_PLING 0.8 2.0"
+    # volumen 0.8, pitch 2.0 (más agudo)
+
+# ── 11. Combinar varias acciones en un solo comando ───────────
+kit-inicio:
+  name: kit-inicio
+  permission: ""
+  actions:
+    - "[TITLE] &a&lKIT RECIBIDO;&7Equipo de inicio entregado."
+    - "[SOUND] ENTITY_PLAYER_LEVELUP"
+    - "[CONSOLE] give {player} iron_sword 1"
+    - "[CONSOLE] give {player} bread 16"
+    - "[MESSAGE] &aRecibiste tu kit de inicio. &7¡Buena suerte!"

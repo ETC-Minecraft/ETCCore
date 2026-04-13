@@ -1,10 +1,15 @@
 package dev.foliacmds;
 
 import dev.foliacmds.command.EnderChestCommand;
+import dev.foliacmds.command.InvSeeCommand;
 import dev.foliacmds.command.ReloadCommand;
+import dev.foliacmds.manager.BuildProtectionListener;
+import dev.foliacmds.manager.ChatInputManager;
 import dev.foliacmds.manager.CommandManager;
 import dev.foliacmds.manager.CooldownManager;
 import dev.foliacmds.manager.FileWatcher;
+import dev.foliacmds.manager.MenuManager;
+import dev.foliacmds.manager.PlayerDataManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -13,6 +18,9 @@ public final class FoliaCustomCommands extends JavaPlugin {
 
     private CommandManager commandManager;
     private CooldownManager cooldownManager;
+    private PlayerDataManager playerDataManager;
+    private MenuManager menuManager;
+    private ChatInputManager chatInputManager;
     private FileWatcher fileWatcher;
     private Thread watcherThread;
 
@@ -21,9 +29,22 @@ public final class FoliaCustomCommands extends JavaPlugin {
         saveDefaultConfig();
         saveDefaultCommands();
 
-        cooldownManager = new CooldownManager();
-        commandManager  = new CommandManager(this);
+        cooldownManager    = new CooldownManager();
+        playerDataManager  = new PlayerDataManager(this);
+        chatInputManager   = new ChatInputManager(this);
+        menuManager        = new MenuManager(this);
+        commandManager     = new CommandManager(this);
+
+        menuManager.loadMenus();
         commandManager.loadCommands();
+
+        getServer().getPluginManager().registerEvents(menuManager, this);
+        getServer().getPluginManager().registerEvents(chatInputManager, this);
+
+        // Protección de construcción (se puede desactivar con build-protection: false)
+        if (getConfig().getBoolean("build-protection", true)) {
+            getServer().getPluginManager().registerEvents(new BuildProtectionListener(this), this);
+        }
 
         // Limpiar cooldowns expirados cada 5 minutos
         getServer().getGlobalRegionScheduler().runAtFixedRate(this,
@@ -39,7 +60,9 @@ public final class FoliaCustomCommands extends JavaPlugin {
 
         var fccCmd = getCommand("fccmds");
         if (fccCmd != null) {
-            fccCmd.setExecutor(new ReloadCommand(this));
+            ReloadCommand rc = new ReloadCommand(this);
+            fccCmd.setExecutor(rc);
+            fccCmd.setTabCompleter(rc);
         }
 
         var ecCmd = getCommand("enderchest");
@@ -48,6 +71,14 @@ public final class FoliaCustomCommands extends JavaPlugin {
             ecCmd.setExecutor(ec);
             ecCmd.setTabCompleter(ec);
             getServer().getPluginManager().registerEvents(ec, this);
+        }
+
+        var isCmd = getCommand("invsee");
+        if (isCmd != null) {
+            InvSeeCommand is = new InvSeeCommand(this);
+            isCmd.setExecutor(is);
+            isCmd.setTabCompleter(is);
+            getServer().getPluginManager().registerEvents(is, this);
         }
 
         getLogger().info("FoliaCustomCommands habilitado — "
@@ -70,6 +101,10 @@ public final class FoliaCustomCommands extends JavaPlugin {
         getLogger().info("FoliaCustomCommands deshabilitado.");
     }
 
-    public CommandManager getCommandManager()   { return commandManager; }
-    public CooldownManager getCooldownManager() { return cooldownManager; }
+    public CommandManager    getCommandManager()    { return commandManager; }
+    public CooldownManager   getCooldownManager()   { return cooldownManager; }
+    public PlayerDataManager getPlayerDataManager() { return playerDataManager; }
+    public MenuManager       getMenuManager()       { return menuManager; }
+    public ChatInputManager  getChatInputManager()  { return chatInputManager; }
 }
+

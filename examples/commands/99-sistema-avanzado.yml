@@ -1,0 +1,226 @@
+# ════════════════════════════════════════════════════════════
+#  SISTEMA DE MISIONES — EJEMPLO AVANZADO COMPLETO
+#
+#  Demuestra TODO el plugin en conjunto:
+#   ✔ Variables [VAR:SET/ADD/DEL]
+#   ✔ Condiciones [IF] con var:, permission:, health<, world:
+#   ✔ [CHANCE] para recompensas aleatorias
+#   ✔ [DELAY] para animaciones
+#   ✔ [SOUND] y [TITLE]
+#   ✔ [MENU] para abrir inventarios GUI
+#   ✔ [INPUT] para capturar texto del jugador
+#   ✔ cooldown: y global-cooldown:
+#   ✔ arg-types: para autocompletado
+#   ✔ [CONSOLE] para ejecutar comandos de otros plugins
+#   ✔ {var:x} y {player} como placeholders
+#
+#  FLUJO COMPLETO DEL SISTEMA:
+#
+#   1. /misiones          → abre el menú de misiones (menus/misiones.yml)
+#   2. El jugador elige una misión desde el menú → [MENU] acepta
+#   3. /completar-mision  → entrega la misión y da puntos/recompensas
+#   4. /rankup            → sube de rango gastando puntos (pide confirmación por chat)
+#   5. /perfil            → muestra el estado actual del jugador
+#   6. Admin: /admin-mision <jugador> → gestión desde consola
+# ════════════════════════════════════════════════════════════
+
+# ──────────────────────────────────────────────────────────
+# COMANDO: /misiones
+# Abre el menú para elegir/ver misiones activas
+# ──────────────────────────────────────────────────────────
+misiones:
+  name: misiones
+  permission: ""
+  actions:
+    - "[MENU] misiones"
+
+# ──────────────────────────────────────────────────────────
+# COMANDO: /aceptar-mision <tipo>
+# Acepta una misión específica. Llamado desde el menú de misiones.
+# arg-types para autocompletado: bosque | mina | mar
+# ──────────────────────────────────────────────────────────
+aceptar-mision:
+  name: aceptar-mision
+  permission: ""
+  arg-types:
+    0: tipo_mision          # hint en tab: "tipo_mision"
+  actions:
+    # No puede aceptar si ya tiene una activa
+    - "[IF] var:mision_activa!=;[MESSAGE] &cYa tienes una misión activa: &e{var:mision_activa}&c. Complétala primero.;"
+
+    # Misión Bosque
+    - "[IF] arg:0=bosque;[VAR:SET] mision_activa bosque"
+    - "[IF] arg:0=bosque;[VAR:SET] mision_pasos 0"
+    - "[IF] arg:0=bosque;[MESSAGE] &2[MISIÓN] &7Tala &e10 árboles &7en el mundo survival."
+    - "[IF] arg:0=bosque;[SOUND] BLOCK_NOTE_BLOCK_PLING"
+
+    # Misión Mina
+    - "[IF] arg:0=mina;[VAR:SET] mision_activa mina"
+    - "[IF] arg:0=mina;[VAR:SET] mision_pasos 0"
+    - "[IF] arg:0=mina;[MESSAGE] &8[MISIÓN] &7Mina &e20 bloques de piedra &7en el mundo survival."
+    - "[IF] arg:0=mina;[SOUND] BLOCK_NOTE_BLOCK_BASS"
+
+    # Misión Mar
+    - "[IF] arg:0=mar;[VAR:SET] mision_activa mar"
+    - "[IF] arg:0=mar;[VAR:SET] mision_pasos 0"
+    - "[IF] arg:0=mar;[MESSAGE] &9[MISIÓN] &7Pesca &e5 peces &7en el mundo survival."
+    - "[IF] arg:0=mar;[SOUND] BLOCK_NOTE_BLOCK_HARP"
+
+    # Argumento inválido
+    - "[IF] arg:0!=bosque;[IF] arg:0!=mina;[IF] arg:0!=mar;[MESSAGE] &cUso: /aceptar-mision <bosque|mina|mar>"
+
+# ──────────────────────────────────────────────────────────
+# COMANDO: /avance-mision
+# Registra un paso completado de la misión activa.
+# (En un entorno real esto lo llamaría un listener de eventos,
+#  aquí lo deja manual para que sea demostrable)
+# ──────────────────────────────────────────────────────────
+avance-mision:
+  name: avance-mision
+  permission: ""
+  cooldown: 3              # 3 segundos para evitar click-spam
+  actions:
+    - "[IF] var:mision_activa=;[MESSAGE] &cNo tienes ninguna misión activa. Usa /misiones.;"
+    - "[VAR:ADD] mision_pasos 1"
+    - "[ACTIONBAR] &7Progreso misión &e{var:mision_activa}&7: &a{var:mision_pasos} &7pasos."
+
+    # Completar misión bosque (10 pasos)
+    - "[IF] var:mision_activa=bosque;[IF] var:mision_pasos>=10;[PLAYER] completar-mision"
+
+    # Completar misión mina (20 pasos)
+    - "[IF] var:mision_activa=mina;[IF] var:mision_pasos>=20;[PLAYER] completar-mision"
+
+    # Completar misión mar (5 pasos)
+    - "[IF] var:mision_activa=mar;[IF] var:mision_pasos>=5;[PLAYER] completar-mision"
+
+# ──────────────────────────────────────────────────────────
+# COMANDO: /completar-mision
+# Se llama automáticamente cuando se alcanzan los pasos requeridos
+# ──────────────────────────────────────────────────────────
+completar-mision:
+  name: completar-mision
+  permission: ""
+  actions:
+    - "[IF] var:mision_activa=;[MESSAGE] &cNo tienes misión activa.;"
+
+    # Animación de completado
+    - "[TITLE] &a&l¡MISIÓN COMPLETA!;&7{var:mision_activa} finalizada.;5;40;10"
+    - "[SOUND] UI_TOAST_CHALLENGE_COMPLETE"
+    - "[DELAY] 5"
+
+    # Puntos base garantizados
+    - "[VAR:ADD] puntos 50"
+    - "[VAR:ADD] misiones_completadas 1"
+    - "[MESSAGE] &a+50 puntos base. Total: &e{var:puntos}"
+
+    # Recompensa aleatoria extra (25% probabilidad)
+    - "[CHANCE] 25%;[CONSOLE] give {player} diamond 2"
+    - "[CHANCE] 25%;[MESSAGE] &b✦ &7Bonus: &b2 diamantes extra"
+    - "[CHANCE] 50%;[CONSOLE] give {player} gold_ingot 5"
+    - "[CHANCE] 50%;[MESSAGE] &6✦ &7Bonus: &65 lingotes de oro extra"
+
+    # Broadcast si el jugador ya completó 5 misiones
+    - "[IF] var:misiones_completadas>=5;[BROADCAST] &a★ &f{player} &7completó su &emisión #&e{var:misiones_completadas}&7 ★"
+
+    # Limpiar estado de misión
+    - "[VAR:DEL] mision_activa"
+    - "[VAR:DEL] mision_pasos"
+    - "[DELAY] 20"
+    - "[MESSAGE] &7Puedes aceptar una nueva misión en &b/misiones&7."
+
+# ──────────────────────────────────────────────────────────
+# COMANDO: /rankup
+# Sube de rango gastando puntos. Pide confirmación por INPUT.
+# Requiere: Novato→100pts, Aventurero→300pts, Veterano→600pts
+# ──────────────────────────────────────────────────────────
+rankup:
+  name: rankup
+  permission: ""
+  cooldown: 10             # evita doble-click accidental
+  actions:
+    # ── Sin rango → asignar Novato gratis ────────────────
+    - "[IF] var:rango=;[VAR:SET] rango Novato;[MESSAGE] &e¡Rango inicial &6Novato &easignado!;"
+
+    # ── Novato → Aventurero (100 pts) ────────────────────
+    - "[IF] var:rango=Novato;[IF] var:puntos<100;[MESSAGE] &cNecesitas &e100 puntos &cpara ascender. Tienes: &e{var:puntos};"
+    - "[IF] var:rango=Novato;[IF] var:puntos>=100;[MESSAGE] &e¿Ascender de &6Novato &ea &aAventurero &epor &a100 pts&e? Escribe &aconfirmar &eo &ccancelar&e:"
+    - "[IF] var:rango=Novato;[IF] var:puntos>=100;[INPUT] rankup_confirm"
+    - "[IF] var:rango=Novato;[IF] var:rankup_confirm=confirmar;[VAR:ADD] puntos -100"
+    - "[IF] var:rango=Novato;[IF] var:rankup_confirm=confirmar;[VAR:SET] rango Aventurero"
+    - "[IF] var:rankup_confirm=confirmar;[IF] var:rango=Aventurero;[CONSOLE] lp user {player} parent set aventurero"
+    - "[IF] var:rankup_confirm=confirmar;[IF] var:rango=Aventurero;[BROADCAST] &2⬆ &f{player} &7ascendió a &2&lAventurero&7!"
+    - "[IF] var:rankup_confirm=confirmar;[IF] var:rango=Aventurero;[TITLE] &a&lASCENSO;&2Aventurero;10;60;10"
+    - "[IF] var:rankup_confirm=confirmar;[IF] var:rango=Aventurero;[SOUND] ENTITY_PLAYER_LEVELUP"
+    - "[IF] var:rankup_confirm=cancelar;[MESSAGE] &cAscenso cancelado."
+    - "[VAR:DEL] rankup_confirm"
+
+    # ── Aventurero → Veterano (300 pts) ──────────────────
+    - "[IF] var:rango=Aventurero;[IF] var:puntos<300;[MESSAGE] &cNecesitas &e300 puntos &cpara ascender. Tienes: &e{var:puntos};"
+    - "[IF] var:rango=Aventurero;[IF] var:puntos>=300;[MESSAGE] &e¿Ascender de &2Aventurero &ea &6Veterano &epor &e300 pts&e? Escribe &aconfirmar &eo &ccancelar&e:"
+    - "[IF] var:rango=Aventurero;[IF] var:puntos>=300;[INPUT] rankup_confirm"
+    - "[IF] var:rango=Aventurero;[IF] var:rankup_confirm=confirmar;[VAR:ADD] puntos -300"
+    - "[IF] var:rango=Aventurero;[IF] var:rankup_confirm=confirmar;[VAR:SET] rango Veterano"
+    - "[IF] var:rankup_confirm=confirmar;[IF] var:rango=Veterano;[CONSOLE] lp user {player} parent set veterano"
+    - "[IF] var:rankup_confirm=confirmar;[IF] var:rango=Veterano;[BROADCAST] &6⬆ &f{player} &7ascendió a &6&lVeterano&7!"
+    - "[IF] var:rankup_confirm=confirmar;[IF] var:rango=Veterano;[TITLE] &6&lASCENSO;&6Veterano;10;60;10"
+    - "[IF] var:rankup_confirm=confirmar;[IF] var:rango=Veterano;[SOUND] UI_TOAST_CHALLENGE_COMPLETE"
+    - "[IF] var:rankup_confirm=cancelar;[MESSAGE] &cAscenso cancelado."
+    - "[VAR:DEL] rankup_confirm"
+
+    # ── Veterano = tope ───────────────────────────────────
+    - "[IF] var:rango=Veterano;[MESSAGE] &6Estás en el rango máximo: &6&lVeterano&6. ¡Felicidades!"
+
+# ──────────────────────────────────────────────────────────
+# COMANDO: /perfil
+# Muestra todos los datos del jugador de un vistazo
+# ──────────────────────────────────────────────────────────
+perfil:
+  name: perfil
+  permission: ""
+  actions:
+    - "[MESSAGE] &8&m━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    - "[MESSAGE] &7  Perfil de &f&l{player}"
+    - "[MESSAGE] &8&m━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    - "[MESSAGE] &7  Rango:             &6{var:rango}"
+    - "[MESSAGE] &7  Puntos:            &e{var:puntos}"
+    - "[MESSAGE] &7  Misiones completadas: &a{var:misiones_completadas}"
+    - "[IF] var:mision_activa!=;[MESSAGE] &7  Misión activa:     &b{var:mision_activa} &7(&e{var:mision_pasos}&7 pasos)"
+    - "[IF] var:mision_activa=;[MESSAGE] &7  Misión activa:     &8Ninguna"
+    - "[MESSAGE] &8&m━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+# ──────────────────────────────────────────────────────────
+# COMANDO: /admin-mision <jugador>  (solo admins)
+# Abre menú de gestión de misión de otro jugador.
+# Aquí se usa arg-types para autocompletar el nombre.
+# ──────────────────────────────────────────────────────────
+admin-mision:
+  name: admin-mision
+  permission: fccmds.admin
+  arg-types:
+    0: player
+  actions:
+    - "[IF] arg:0=;[MESSAGE] &cUso: /admin-mision <jugador>;"
+    # Usando el comando nativo de invsee para ver inventario
+    - "[MESSAGE] &8[ADMIN] Gestionando misión de &e{arg:0}"
+    - "[MESSAGE] &7Comandos útiles:"
+    - "[MESSAGE] &8  → /setvar {arg:0} puntos <cantidad>"
+    - "[MESSAGE] &8  → /setvar {arg:0} rango <rango>"
+    - "[MESSAGE] &8  → /setvar {arg:0} mision_activa <mision|vacío>"
+    - "[SOUND] BLOCK_NOTE_BLOCK_PLING"
+
+# ──────────────────────────────────────────────────────────
+# COMANDO: /evento-global
+# Activa un evento que bloquea el comando para todos
+# durante 1 hora (global-cooldown)
+# ──────────────────────────────────────────────────────────
+evento-global:
+  name: evento-global
+  permission: fccmds.admin
+  global-cooldown: 3600
+  actions:
+    - "[BROADCAST] &6&l★ EVENTO ★ &f{player} &7activó el evento. ¡Participa!"
+    - "[BROADCAST] &e➜ Completa 3 misiones en la próxima hora para ganar premios."
+    - "[CONSOLE] broadcast &eEl evento termina en &61 hora&e."
+    - "[SOUND] UI_TOAST_CHALLENGE_COMPLETE"
+    - "[DELAY] 60"          # 3 segundos después, mensaje de recordatorio
+    - "[BROADCAST] &7Recuerda: usa &b/misiones &7para participar en el evento."

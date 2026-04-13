@@ -1,0 +1,107 @@
+# ============================================================
+#  EJEMPLO 05 — INPUT + ARG-TYPES (AUTOCOMPLETADO)
+# ============================================================
+
+# ─────────────────────── [INPUT] ────────────────────────────
+# [INPUT] nombre_variable
+#   Pausa la ejecución y espera a que el jugador escriba en el chat.
+#   Lo que escriba se guarda en la variable indicada.
+#   El mensaje en chat se CANCELA (no se muestra a otros jugadores).
+
+# ── 1. Pedir nombre personalizado ────────────────────────────
+set-apodo:
+  name: set-apodo
+  permission: ""
+  actions:
+    - "[MESSAGE] &7Escribe tu &eapodo &7en el chat: &8(o escribe &ccancelar&8)"
+    - "[INPUT] apodo_temp"
+    - "[IF] var:apodo_temp=cancelar;[MESSAGE] &cCancelado.;[VAR:SET] apodo {var:apodo_temp}"
+    - "[IF] var:apodo!=cancelar;[MESSAGE] &aTu apodo ahora es: &e{var:apodo}"
+
+# ── 2. Sugerencia o reporte de bug ───────────────────────────
+reportar:
+  name: reportar
+  permission: ""
+  cooldown: 60             # evitar spam de reportes
+  actions:
+    - "[MESSAGE] &eDescribe el problema en el chat &8(1 mensaje):"
+    - "[INPUT] reporte_texto"
+    - "[MESSAGE] &aReporte enviado. Gracias."
+    - "[CONSOLE] broadcast &4[REPORTE] &f{player}&7: &f{var:reporte_texto}"
+
+# ── 3. Crear "ticket" guardando la consulta ──────────────────
+ticket:
+  name: ticket
+  permission: ""
+  actions:
+    - "[MESSAGE] &b== Soporte == &7Escribe tu consulta en el chat:"
+    - "[INPUT] ticket_msg"
+    - "[VAR:SET] tiene_ticket si"
+    - "[CONSOLE] broadcast &9[TICKET] &f{player}&7 abrió: &f{var:ticket_msg}"
+    - "[TITLE] &b&lTICKET ABIERTO;&7Un staff te atenderá pronto.;5;50;5"
+
+# ── 4. Multi-step con INPUT encadenado ───────────────────────
+# (nombre + apellido en dos preguntas)
+registro:
+  name: registro
+  permission: ""
+  actions:
+    - "[IF] var:registro=completo;[MESSAGE] &cYa tienes registro.;"
+    - "[MESSAGE] &7Paso 1/2 — Escribe tu &enombre:"
+    - "[INPUT] reg_nombre"
+    - "[MESSAGE] &7Paso 2/2 — Escribe tu &eapellido:"
+    - "[INPUT] reg_apellido"
+    - "[VAR:SET] registro completo"
+    - "[MESSAGE] &a¡Registro guardado! &7Bienvenido, &e{var:reg_nombre} {var:reg_apellido}&7."
+
+# ─────────────────── ARG-TYPES (Tab-complete) ────────────────
+# arg-types:
+#   N: tipo   (N = número de argumento, empezando en 0)
+# Tipos soportados:
+#   player  → sugiere nombres de jugadores online
+#   (otros valores aparecen como texto fijo en sugerencia)
+
+# ── 5. Comando con autocompletado de jugador ─────────────────
+ver-perfil:
+  name: ver-perfil
+  permission: ""
+  arg-types:
+    0: player              # primer argumento → lista de jugadores online
+  actions:
+    - "[MESSAGE] &7Perfil de: &e{arg:0}"
+    # {arg:0} se sustituye por el primer argumento del comando
+    # Ej: /ver-perfil Steve  → muestra perfil de Steve
+
+# ── 6. Dar puntos a otro jugador (2 argumentos) ──────────────
+dar-puntos:
+  name: dar-puntos
+  permission: fccmds.admin
+  arg-types:
+    0: player              # nombre del jugador
+    1: cantidad            # segundo argumento (se muestra "cantidad" como hint)
+  actions:
+    - "[IF] arg:0!=;[CONSOLE] fccmds-setvar {arg:0} puntos {arg:1};[MESSAGE] &cUso: /dar-puntos <jugador> <cantidad>"
+    - "[MESSAGE] &aDiste &e{arg:1} puntos &aa &e{arg:0}&a."
+
+# ── 7. Teleport a jugador (solo tab-complete, sin más lógica) ──
+tp-a:
+  name: tp-a
+  permission: fccmds.admin
+  arg-types:
+    0: player
+  actions:
+    - "[PLAYER] tp {arg:0}"
+    - "[MESSAGE] &aTeletransportado a &e{arg:0}&a."
+
+# ── 8. Combinando input + arg-types ──────────────────────────
+# arg-types para el primer arg, luego [INPUT] para texto largo
+mensaje-privado:
+  name: mensaje-privado
+  permission: ""
+  arg-types:
+    0: player
+  actions:
+    - "[IF] arg:0!=;[MESSAGE] &7Escribe tu mensaje para &e{arg:0}&7:;[MESSAGE] &cUso: /mensaje-privado <jugador>"
+    - "[INPUT] mp_texto"
+    - "[CONSOLE] msg {arg:0} &7[MP de &e{player}&7]: &f{var:mp_texto}"
+    - "[MESSAGE] &7Mensaje enviado a &e{arg:0}&7."

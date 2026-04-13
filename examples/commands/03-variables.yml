@@ -1,0 +1,94 @@
+# ============================================================
+#  EJEMPLO 03 — VARIABLES [VAR]
+#  Guarda datos por jugador de forma persistente.
+#  Los datos se mantienen incluso si el jugador se desconecta.
+# ============================================================
+# Acciones:
+#   [VAR:SET] nombre valor_o_expresión  → asigna / sobreescribe
+#   [VAR:ADD] nombre cantidad           → suma (o resta con número negativo)
+#   [VAR:DEL] nombre                    → elimina la variable
+# Placeholder:
+#   {var:nombre}  → sustituye el valor en mensajes y acciones
+# Condición en [IF]:
+#   var:nombre=valor   var:nombre!=valor
+#   var:nombre>N       var:nombre>=N
+#   var:nombre<N       var:nombre<=N
+
+# ── 1. Asignar un valor fijo ──────────────────────────────────
+iniciar-rango:
+  name: iniciar-rango
+  permission: fccmds.admin
+  actions:
+    - "[VAR:SET] rango Novato"
+    - "[MESSAGE] &7Tu rango fue establecido a: &e{var:rango}"
+
+# ── 2. Mostrar el valor de una variable ──────────────────────
+mi-rango:
+  name: mi-rango
+  permission: ""
+  actions:
+    - "[IF] var:rango!=;[MESSAGE] &7Tu rango actual es: &6{var:rango};[MESSAGE] &cAún no tienes rango asignado."
+
+# ── 3. Contador simple (sumar 1 cada vez que se usa) ─────────
+contar-muertes:
+  name: contar-muertes
+  permission: ""
+  actions:
+    - "[VAR:ADD] muertes 1"
+    - "[MESSAGE] &cMoriste. Total de muertes: &e{var:muertes}"
+
+# ── 4. Restar puntos ─────────────────────────────────────────
+gastar-puntos:
+  name: gastar-puntos
+  permission: ""
+  actions:
+    - "[IF] var:puntos>=50;[VAR:ADD] puntos -50;[MESSAGE] &cNo tienes suficientes puntos (necesitas 50)."
+    - "[IF] var:puntos>=0;[MESSAGE] &aGastaste 50 puntos. Te quedan: &e{var:puntos}"
+
+# ── 5. Expresión matemática con otra variable ─────────────────
+doblar-puntos:
+  name: doblar-puntos
+  permission: fccmds.admin
+  actions:
+    # {var:puntos}*2 → multiplica el valor actual por 2
+    - "[VAR:SET] puntos {var:puntos}*2"
+    - "[MESSAGE] &6¡Puntos doblados! Ahora tienes: &e{var:puntos}"
+
+# ── 6. Eliminar una variable ─────────────────────────────────
+reset-datos:
+  name: reset-datos
+  permission: fccmds.admin
+  actions:
+    - "[VAR:DEL] rango"
+    - "[VAR:DEL] puntos"
+    - "[VAR:DEL] muertes"
+    - "[MESSAGE] &cTus datos han sido reiniciados."
+
+# ── 7. Variables como flags (booleanos) ───────────────────────
+modo-sigilo:
+  name: modo-sigilo
+  permission: ""
+  actions:
+    # Si sigilo=on → apágalo. Si no → enciéndelo.
+    - "[IF] var:sigilo=on;[VAR:SET] sigilo off;[VAR:SET] sigilo on"
+    - "[IF] var:sigilo=on;[MESSAGE] &8👁 Modo sigilo &aACTIVADO&8."
+    - "[IF] var:sigilo=off;[MESSAGE] &8👁 Modo sigilo &cDESACTIVADO&8."
+
+# ── 8. Cadena de variables para progreso de misión ───────────
+avanzar-mision:
+  name: avanzar-mision
+  permission: ""
+  actions:
+    - "[IF] var:paso_mision<3;[VAR:ADD] paso_mision 1;[MESSAGE] &cYa completaste todos los pasos."
+    - "[IF] var:paso_mision=1;[MESSAGE] &7Paso 1/3: &eReune 5 manzanas."
+    - "[IF] var:paso_mision=2;[MESSAGE] &7Paso 2/3: &eDerrota 3 zombies."
+    - "[IF] var:paso_mision=3;[VAR:SET] mision completada;[TITLE] &a&lMISIÓN COMPLETA;&7Habla con el NPC.;10;60;10"
+
+# ── 9. Usar variable en un comando de consola ─────────────────
+# (típico para pasar el valor a otro plugin)
+aplicar-rango-luckperms:
+  name: aplicar-rango-luckperms
+  permission: fccmds.admin
+  actions:
+    - "[IF] var:rango!=;[CONSOLE] lp user {player} parent set {var:rango};[MESSAGE] &cEste jugador no tiene rango definido."
+    - "[MESSAGE] &aRango &e{var:rango} &aaplicado en LuckPerms."

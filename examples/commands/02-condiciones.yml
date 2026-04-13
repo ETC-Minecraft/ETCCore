@@ -1,0 +1,85 @@
+# ============================================================
+#  EJEMPLO 02 — CONDICIONES [IF]
+#  Comprueba permisos, mundo, vida, hambre, modo de juego
+#  y variables propias antes de ejecutar acciones
+# ============================================================
+# Sintaxis: [IF] condición;acción_si_verdadero;acción_si_falso
+#   • La acción si_falso es OPCIONAL (omítela si no necesitas nada).
+#   • Puedes poner cualquier otra acción (MESSAGE, CONSOLE, etc.)
+
+# ── 1. Comprobar permiso ──────────────────────────────────────
+volar:
+  name: volar
+  permission: ""
+  actions:
+    - "[IF] permission:fccmds.vip;[PLAYER] fly;[MESSAGE] &cNecesitas ser VIP para volar."
+
+# ── 2. Comprobar mundo ───────────────────────────────────────
+portal-pvp:
+  name: portal-pvp
+  permission: ""
+  actions:
+    - "[IF] world:mundo_lobby;[PLAYER] warp pvp;[MESSAGE] &cEste portal solo funciona en el lobby."
+
+# ── 3. Comprobar vida mínima ─────────────────────────────────
+usar-pocion:
+  name: usar-pocion
+  permission: ""
+  actions:
+    # Solo deja usar la poción si tienes menos de 10 de vida (media barra)
+    - "[IF] health<10;[CONSOLE] effect give {player} instant_health 1 1;[MESSAGE] &cTienes vida suficiente, no la necesitas."
+
+# ── 4. Comprobar mundo Y vida (condiciones encadenadas) ───────
+escape-pvp:
+  name: escape-pvp
+  permission: ""
+  actions:
+    - "[IF] world:mundo_pvp;[IF] health<8;[PLAYER] spawn;[MESSAGE] &cNo puedes escapar con tanta vida."
+    # Esto ejecuta los dos IFs en secuencia:
+    #  1. Si estás en mundo_pvp → evalúa la siguiente línea
+    #  2. Si además tienes <8 de vida → /spawn
+
+# ── 5. Comprobar hambre ──────────────────────────────────────
+comer:
+  name: comer
+  permission: ""
+  actions:
+    - "[IF] food<15;[CONSOLE] feed {player};[MESSAGE] &cNo tienes hambre suficiente para comer gratis."
+
+# ── 6. Comprobar modo de juego exacto ───────────────────────
+modo-creativo:
+  name: modo-creativo
+  permission: fccmds.admin
+  actions:
+    - "[IF] gamemode:SURVIVAL;[PLAYER] gamemode creative;[MESSAGE] &cYa estás en creativo."
+
+# ── 7. Comprobar variable propia (igual que) ─────────────────
+ver-estado:
+  name: ver-estado
+  permission: ""
+  actions:
+    - "[IF] var:estado=activo;[MESSAGE] &aTu cuenta está ACTIVA.;[MESSAGE] &cTu cuenta está INACTIVA."
+
+# ── 8. Comprobar variable numérica (mayor que) ───────────────
+canjear-puntos:
+  name: canjear-puntos
+  permission: ""
+  actions:
+    - "[IF] var:puntos>=100;[MESSAGE] &aTienes suficientes puntos para canjear.;[MESSAGE] &cNecesitas al menos &e100 puntos&c. Tienes: &e{var:puntos}"
+
+# ── 9. Comprobar variable (distinto de) ──────────────────────
+check-rango:
+  name: check-rango
+  permission: ""
+  actions:
+    - "[IF] var:rango!=admin;[MESSAGE] &7Eres rango: &e{var:rango};[MESSAGE] &4Eres ADMINISTRADOR."
+
+# ── 10. Múltiples caminos lógicos con variables ───────────────
+check-mision:
+  name: check-mision
+  permission: ""
+  actions:
+    - "[IF] var:mision=completada;[MESSAGE] &a✔ Misión completada. Reclama tu recompensa."
+    - "[IF] var:mision=en_progreso;[MESSAGE] &e⚙ Misión en progreso: avanza más."
+    - "[IF] var:mision!=completada;[IF] var:mision!=en_progreso;[MESSAGE] &7No tienes misión activa."
+    # Nota: la última línea se ejecuta si ninguna de las anteriores coincide

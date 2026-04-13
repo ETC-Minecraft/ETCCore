@@ -9,12 +9,16 @@ author: TuNombre
 commands:
   fccmds:
     description: Administración de FoliaCustomCommands
-    usage: /fccmds reload
+    usage: /fccmds <reload|onlinemode>
     permission: fccmds.admin
   enderchest:
     description: Abre tu enderchest o el de otro jugador
     usage: /enderchest [jugador]
     permission: fccmds.enderchest
+  invsee:
+    description: Ve y edita el inventario de otro jugador (online u offline)
+    usage: /invsee <jugador>
+    permission: fccmds.invsee
 
 permissions:
   fccmds.admin:
@@ -26,3 +30,16 @@ permissions:
   fccmds.enderchest.others:
     description: Permite ver el enderchest de otros jugadores con /enderchest <jugador>
     default: op
+  fccmds.invsee:
+    description: Permite ver inventarios de jugadores online con /invsee
+    default: op
+  fccmds.invsee.offline:
+    description: Permite ver inventarios de jugadores offline con /invsee
+    default: op
+  fccmds.build:
+    description: Permite colocar y romper bloques. Asigna este nodo al grupo aprobado.
+    default: op
+  fccmds.build.bypass:
+    description: Ignora completamente la protección de construcción (admins, staff).
+    default: op
+

@@ -7,3 +7,15 @@ verbose-outputs: false
 
 # Recarga automáticamente los archivos de commands/ cuando detecta cambios (default: true)
 auto-reload: true
+
+# ────────────────────────────
+# Protección de construcción
+# ────────────────────────────
+# Activa el sistema que bloquea colocar/romper bloques a jugadores sin fccmds.build.
+# true  = activo (recomendado para servidores con grupo default sin acceso)
+# false = desactivado (usa otro plugin para gestionar esto)
+build-protection: true
+
+# Mensaje que recibe el jugador cuando intenta construir sin permiso.
+# Soporta códigos de color &. Se muestra en la barra de acción (sobre el hotbar).
+build-protection-message: "&cNecesitas ser aprobado para construir o romper bloques."

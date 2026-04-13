@@ -1,0 +1,83 @@
+# ============================================================
+#  MENÚ DE MISIONES — parte del sistema avanzado
+#  Se abre con /misiones
+# ============================================================
+
+title: "&8☰ &b&lMisiones Disponibles"
+rows: 3
+# permission: ""   ← cualquier jugador puede ver las misiones
+# Para restringirlo: permission: fccmds.menus.misiones
+
+items:
+
+  # ── Decoración ───────────────────────────────────────────
+  0:  { material: CYAN_STAINED_GLASS_PANE, name: " " }
+  1:  { material: CYAN_STAINED_GLASS_PANE, name: " " }
+  7:  { material: CYAN_STAINED_GLASS_PANE, name: " " }
+  8:  { material: CYAN_STAINED_GLASS_PANE, name: " " }
+  18: { material: CYAN_STAINED_GLASS_PANE, name: " " }
+  19: { material: CYAN_STAINED_GLASS_PANE, name: " " }
+  25: { material: CYAN_STAINED_GLASS_PANE, name: " " }
+  26: { material: CYAN_STAINED_GLASS_PANE, name: " " }
+
+  # ── Estado actual ─────────────────────────────────────────
+  4:
+    material: MAP
+    name: "&b&lTu estado"
+    lore:
+      - "&7Rango: &6{var:rango}"
+      - "&7Puntos: &e{var:puntos}"
+      - "&7Misión activa: &b{var:mision_activa}"
+      - "&7Pasos: &e{var:mision_pasos}"
+    close-on-click: false
+    actions: []
+
+  # ── Misión Bosque ─────────────────────────────────────────
+  10:
+    material: OAK_LOG
+    name: "&2&lMisión del Bosque"
+    lore:
+      - "&7Tala &e10 árboles &7en survival."
+      - "&7Recompensa: &e50 pts &7+ sorpresa"
+      - ""
+      - "&a→ Click para aceptar"
+    glow: true
+    close-on-click: true
+    actions:
+      - "[PLAYER] aceptar-mision bosque"
+
+  # ── Misión Mina ───────────────────────────────────────────
+  13:
+    material: STONE_PICKAXE
+    name: "&8&lMisión de la Mina"
+    lore:
+      - "&7Mina &e20 bloques de piedra."
+      - "&7Recompensa: &e50 pts &7+ sorpresa"
+      - ""
+      - "&a→ Click para aceptar"
+    glow: true
+    close-on-click: true
+    actions:
+      - "[PLAYER] aceptar-mision mina"
+
+  # ── Misión Mar ────────────────────────────────────────────
+  16:
+    material: FISHING_ROD
+    name: "&9&lMisión del Mar"
+    lore:
+      - "&7Pesca &e5 peces."
+      - "&7Recompensa: &e50 pts &7+ sorpresa"
+      - ""
+      - "&a→ Click para aceptar"
+    glow: true
+    close-on-click: true
+    actions:
+      - "[PLAYER] aceptar-mision mar"
+
+  # ── Cerrar ────────────────────────────────────────────────
+  22:
+    material: BARRIER
+    name: "&c&lCerrar"
+    close-on-click: true
+    actions:
+      - "[CLOSE]"

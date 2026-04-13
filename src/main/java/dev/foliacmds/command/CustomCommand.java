@@ -4,6 +4,7 @@ import dev.foliacmds.FoliaCustomCommands;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.title.Title;
+import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -13,6 +14,7 @@ import org.bukkit.entity.Player;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Comando personalizado cargado desde un archivo YAML en commands/.
@@ -30,6 +32,12 @@ import java.util.List;
  *   [DELAY:ticks] <acción>     → Ejecuta cualquier acción con retraso
  *   [CHANCE:porcentaje] <acción> → Ejecuta con probabilidad (0-100)
  *   [IF condición] <acción>    → Ejecuta si se cumple la condición
+ *   [VAR:SET] nombre = expr    → Guarda una variable por jugador
+ *   [VAR:ADD] nombre = N       → Suma N a una variable numérica (alias de SET con expr)
+ *   [VAR:DEL] nombre           → Elimina una variable
+ *   [INPUT] variable;prompt    → Pide texto al jugador (captura siguiente mensaje)
+ *   [MENU] nombre              → Abre un menú definido en menus/<nombre>.yml
+ *   [PAPI] texto con %placeholder%  → Reemplaza PlaceholderAPI si está instalado
  *
  * === CONDICIONES PARA [IF] ===
  *   permission:nodo            → Tiene el permiso
@@ -38,9 +46,20 @@ import java.util.List;
  *   !world:nombre              → NO está en ese mundo
  *   health>5.0                 → Vida mayor a 5 corazones
  *   health<10.0                → Vida menor a 10 corazones
+ *   var:nombre=valor           → Variable igual a valor
+ *   var:nombre!=valor          → Variable distinta
+ *   var:nombre>N               → Variable numérica mayor que N
+ *   var:nombre<N               → Variable numérica menor que N
  *
  * === PLACEHOLDERS ===
  *   {player}  {world}  {x} {y} {z}  {args}  {arg0} {arg1}...
+ *   {var:nombre}               → Valor de una variable del jugador
+ *
+ * === ARGS TIPADOS (tab-complete automático) ===
+ *   arg-types:
+ *     0: player        → completa con jugadores online
+ *     1: number        → sin sugerencias (solo número)
+ *     2: text          → texto libre
  */
 public class CustomCommand extends Command {
 
@@ -53,12 +72,14 @@ public class CustomCommand extends Command {
     private String noPermMessage;
     private boolean consoleAllowed;
     private long cooldownSeconds;
+    private long globalCooldownSeconds;
     private String cooldownMessage;
     private List<String> worldsAllowed;
     private List<String> worldsBlacklist;
     private String worldsMessage;
     private double minHealth;
     private String healthMessage;
+    private Map<Integer, String> argTypes; // índice → tipo (player, number, text)
 
     public CustomCommand(FoliaCustomCommands plugin, String name, ConfigurationSection sec) {
         super(name);
@@ -75,6 +96,7 @@ public class CustomCommand extends Command {
         consoleAllowed = sec.getBoolean("console-allowed", false);
         actions        = new ArrayList<>(sec.getStringList("actions"));
         cooldownSeconds = sec.getLong("cooldown", 0);
+        globalCooldownSeconds = sec.getLong("global-cooldown", 0);
         cooldownMessage = sec.getString("cooldown-message",
                 "&cEspera &e{remaining}s &cpara volver a usar este comando.");
 
@@ -91,6 +113,17 @@ public class CustomCommand extends Command {
             worldsMessage   = "&cNo puedes usar esto en este mundo.";
             minHealth       = 0.0;
             healthMessage   = "&cNecesitas más salud para usar esto.";
+        }
+
+        // Arg types para tab-complete
+        argTypes = new java.util.LinkedHashMap<>();
+        ConfigurationSection argTypesSec = sec.getConfigurationSection("arg-types");
+        if (argTypesSec != null) {
+            for (String key : argTypesSec.getKeys(false)) {
+                try {
+                    argTypes.put(Integer.parseInt(key), argTypesSec.getString(key, "text").toLowerCase());
+                } catch (NumberFormatException ignored) {}
+            }
         }
 
         String desc = sec.getString("description", "");
@@ -139,7 +172,21 @@ public class CustomCommand extends Command {
             }
         }
 
-        // Cooldown
+        // Cooldown global
+        if (globalCooldownSeconds > 0) {
+            var cd = plugin.getCooldownManager();
+            if (cd.isOnGlobalCooldown(getName())) {
+                long remaining = cd.getGlobalRemainingSeconds(getName());
+                String msg = cooldownMessage
+                        .replace("{remaining}", String.valueOf(remaining))
+                        .replace("{command}", getName());
+                sender.sendMessage(comp(msg));
+                return true;
+            }
+            cd.setGlobalCooldown(getName(), globalCooldownSeconds);
+        }
+
+        // Cooldown por jugador
         if (cooldownSeconds > 0 && player != null) {
             var cd = plugin.getCooldownManager();
             if (cd.isOnCooldown(player.getUniqueId(), getName())) {
@@ -157,6 +204,27 @@ public class CustomCommand extends Command {
             processAction(sender, player, rawAction, args);
         }
         return true;
+    }
+
+    // -------------------------------------------------------------------------
+    // Tab-complete con arg-types
+    // -------------------------------------------------------------------------
+    @Override
+    public List<String> tabComplete(CommandSender sender, String alias, String[] args) {
+        if (argTypes.isEmpty()) return super.tabComplete(sender, alias, args);
+
+        int index = args.length - 1;
+        String type = argTypes.getOrDefault(index, "text");
+        String partial = args[index].toLowerCase();
+
+        return switch (type) {
+            case "player" -> Bukkit.getOnlinePlayers().stream()
+                    .map(Player::getName)
+                    .filter(n -> n.toLowerCase().startsWith(partial))
+                    .toList();
+            case "number" -> List.of();
+            default -> List.of();
+        };
     }
 
     // -------------------------------------------------------------------------
@@ -211,6 +279,46 @@ public class CustomCommand extends Command {
             } catch (NumberFormatException e) {
                 plugin.getLogger().warning("Delay inválido: " + rawAction);
             }
+            return;
+        }
+
+        // [VAR:SET] nombre = expresión
+        if (action.startsWith("[VAR:SET]") || action.startsWith("[VAR:ADD]")) {
+            if (player == null) return;
+            String body = action.substring(action.indexOf(']') + 1).trim();
+            int eq = body.indexOf('=');
+            if (eq < 0) return;
+            String varName = body.substring(0, eq).trim();
+            String expr    = body.substring(eq + 1).trim();
+            plugin.getPlayerDataManager().set(player.getUniqueId(), varName, expr);
+            return;
+        }
+
+        // [VAR:DEL] nombre
+        if (action.startsWith("[VAR:DEL]")) {
+            if (player == null) return;
+            String varName = action.substring("[VAR:DEL]".length()).trim();
+            plugin.getPlayerDataManager().remove(player.getUniqueId(), varName);
+            return;
+        }
+
+        // [INPUT] variable;prompt
+        if (action.startsWith("[INPUT]")) {
+            if (player == null) return;
+            String body = action.substring("[INPUT]".length()).trim();
+            String[] parts = body.split(";", 2);
+            String varName = parts[0].trim();
+            String prompt  = parts.length > 1 ? parts[1].trim() : "&eEscribe el valor:";
+            player.sendMessage(comp(prompt));
+            plugin.getChatInputManager().expect(player.getUniqueId(), varName);
+            return;
+        }
+
+        // [MENU] nombre
+        if (action.startsWith("[MENU]")) {
+            if (player == null) return;
+            String menuName = action.substring("[MENU]".length()).trim();
+            plugin.getMenuManager().openMenu(player, menuName);
             return;
         }
 
@@ -339,12 +447,51 @@ public class CustomCommand extends Command {
                 double hp = Double.parseDouble(condition.substring("health<".length()));
                 result = player != null && player.getHealth() < hp;
             } catch (NumberFormatException e) { result = false; }
+        } else if (condition.startsWith("var:")) {
+            result = evalVarCondition(condition.substring("var:".length()), player);
         } else {
             plugin.getLogger().warning("Condición desconocida en [IF]: " + condition);
             result = false;
         }
 
         return negate != result; // XOR para negación
+    }
+
+    /** Evalúa condiciones sobre variables: nombre=val, nombre!=val, nombre>N, nombre<N */
+    private boolean evalVarCondition(String expr, Player player) {
+        if (player == null) return false;
+        String val;
+
+        if (expr.contains("!=")) {
+            String[] p = expr.split("!=", 2);
+            val = plugin.getPlayerDataManager().get(player.getUniqueId(), p[0].trim());
+            return !val.equalsIgnoreCase(p[1].trim());
+        } else if (expr.contains(">=")) {
+            String[] p = expr.split(">=", 2);
+            val = plugin.getPlayerDataManager().get(player.getUniqueId(), p[0].trim());
+            try { return Double.parseDouble(val) >= Double.parseDouble(p[1].trim()); }
+            catch (NumberFormatException e) { return false; }
+        } else if (expr.contains("<=")) {
+            String[] p = expr.split("<=", 2);
+            val = plugin.getPlayerDataManager().get(player.getUniqueId(), p[0].trim());
+            try { return Double.parseDouble(val) <= Double.parseDouble(p[1].trim()); }
+            catch (NumberFormatException e) { return false; }
+        } else if (expr.contains(">")) {
+            String[] p = expr.split(">", 2);
+            val = plugin.getPlayerDataManager().get(player.getUniqueId(), p[0].trim());
+            try { return Double.parseDouble(val) > Double.parseDouble(p[1].trim()); }
+            catch (NumberFormatException e) { return false; }
+        } else if (expr.contains("<")) {
+            String[] p = expr.split("<", 2);
+            val = plugin.getPlayerDataManager().get(player.getUniqueId(), p[0].trim());
+            try { return Double.parseDouble(val) < Double.parseDouble(p[1].trim()); }
+            catch (NumberFormatException e) { return false; }
+        } else if (expr.contains("=")) {
+            String[] p = expr.split("=", 2);
+            val = plugin.getPlayerDataManager().get(player.getUniqueId(), p[0].trim());
+            return val.equalsIgnoreCase(p[1].trim());
+        }
+        return false;
     }
 
     // -------------------------------------------------------------------------
@@ -359,6 +506,20 @@ public class CustomCommand extends Command {
             r = r.replace("{x}", String.valueOf((int) player.getLocation().getX()));
             r = r.replace("{y}", String.valueOf((int) player.getLocation().getY()));
             r = r.replace("{z}", String.valueOf((int) player.getLocation().getZ()));
+
+            // Variables de jugador: {var:nombre}
+            int idx;
+            while ((idx = r.indexOf("{var:")) >= 0) {
+                int end = r.indexOf("}", idx);
+                if (end < 0) break;
+                String varName = r.substring(idx + 5, end);
+                String varVal  = plugin.getPlayerDataManager().get(player.getUniqueId(), varName);
+                r = r.substring(0, idx) + varVal + r.substring(end + 1);
+            }
+
+            // PlaceholderAPI (solo si está instalado)
+            r = applyPapi(r, player);
+
         } else {
             r = r.replace("{player}", sender.getName());
         }
@@ -367,6 +528,55 @@ public class CustomCommand extends Command {
             r = r.replace("{arg" + i + "}", args[i]);
         }
         return r;
+    }
+
+    /** Aplica PlaceholderAPI si el plugin está habilitado en el servidor. */
+    private String applyPapi(String text, Player player) {
+        if (!Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) return text;
+        try {
+            Class<?> papiClass = Class.forName("me.clip.placeholderapi.PlaceholderAPI");
+            return (String) papiClass
+                    .getMethod("setPlaceholders", Player.class, String.class)
+                    .invoke(null, player, text);
+        } catch (Exception e) {
+            return text;
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Método estático para que otros sistemas (MenuManager) ejecuten acciones
+    // sin necesidad de crear un comando real.
+    // -------------------------------------------------------------------------
+    public static void fireAction(FoliaCustomCommands plugin, Player player,
+                                  String action, String[] args) {
+        ActionEngine.run(plugin, player, action, args);
+    }
+
+    /**
+     * Motor de acciones expuesto estáticamente para reutilización.
+     * Se usa desde fireAction (MenuManager) y desde processAction.
+     */
+    static class ActionEngine {
+        static void run(FoliaCustomCommands plugin, Player player,
+                        String action, String[] args) {
+            // Delegamos a una instancia mínima temporal que solo usa processAction
+            new _Runner(plugin).exec(player, action, args);
+        }
+
+        private static class _Runner {
+            private final FoliaCustomCommands plugin;
+            _Runner(FoliaCustomCommands p) { this.plugin = p; }
+
+            void exec(Player player, String action, String[] args) {
+                // Reusa la implementación de processAction de CustomCommand
+                // creando un CustomCommand con YamlConfiguration mínima
+                org.bukkit.configuration.file.YamlConfiguration sec =
+                        new org.bukkit.configuration.file.YamlConfiguration();
+                sec.set("actions", List.of());
+                CustomCommand tmp = new CustomCommand(plugin, "__dispatch__", sec);
+                tmp.processAction(player, player, action, args);
+            }
+        }
     }
 
     // -------------------------------------------------------------------------

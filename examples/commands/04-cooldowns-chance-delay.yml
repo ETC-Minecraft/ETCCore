@@ -1,0 +1,125 @@
+# ============================================================
+#  EJEMPLO 04 — COOLDOWNS + CHANCE + DELAY
+# ============================================================
+# cooldown: N        → el jugador debe esperar N segundos entre usos
+# global-cooldown: N → TODOS los jugadores deben esperar N segundos
+#                      (uno usa el comando → bloquea para todos)
+# [CHANCE] N%        → la siguiente acción ocurre solo N% de las veces
+# [DELAY] N          → espera N ticks (~0.05 seg/tick) antes de la siguiente acción
+
+# ═══════════════════════ COOLDOWN ════════════════════════════
+
+# ── 1. Cooldown por jugador ───────────────────────────────────
+kit-diario:
+  name: kit-diario
+  permission: ""
+  cooldown: 86400          # 86400 seg = 24 horas
+  actions:
+    - "[CONSOLE] give {player} cooked_beef 16"
+    - "[CONSOLE] give {player} oak_log 32"
+    - "[TITLE] &a&lKIT DIARIO;&7Vuelve mañana por más."
+    - "[SOUND] ENTITY_PLAYER_LEVELUP"
+    # Si el jugador lo intenta antes de 24h recibirá:
+    # "Debes esperar X segundos para usar este comando."
+
+# ── 2. Cooldown corto (anti-spam) ────────────────────────────
+me-accion:
+  name: me-accion
+  permission: ""
+  cooldown: 5              # 5 segundos entre usos
+  actions:
+    - "[BROADCAST] &7* &f{player} &7usa un comando de rol."
+
+# ── 3. Global cooldown (comparte cooldown entre todos) ───────
+evento-global:
+  name: evento-global
+  permission: "fccmds.evento"
+  global-cooldown: 3600    # 1 hora desde que CUALQUIER jugador lo use
+  actions:
+    - "[BROADCAST] &6&l★ EVENTO ★ &e{player} &7activó el evento. ¡Participa!"
+    - "[CONSOLE] event start"
+    # Útil para eventos, jefes, recompensas de servidor, etc.
+
+# ── 4. Cooldown + condición combinados ───────────────────────
+votekick:
+  name: votekick
+  permission: ""
+  cooldown: 300            # 5 minutos entre votaciones por jugador
+  actions:
+    - "[IF] permission:fccmds.vip;[BROADCAST] &e{player} &7inició una votación.;[MESSAGE] &cNecesitas VIP para iniciar votaciones."
+
+# ═══════════════════════ CHANCE ══════════════════════════════
+
+# ── 5. Recompensa aleatoria simple ───────────────────────────
+cofre-diario:
+  name: cofre-diario
+  permission: ""
+  cooldown: 86400
+  actions:
+    - "[MESSAGE] &7Abriste el cofre diario..."
+    - "[CHANCE] 60%;[CONSOLE] give {player} gold_ingot 5"
+    - "[CHANCE] 30%;[CONSOLE] give {player} diamond 1"
+    - "[CHANCE] 10%;[CONSOLE] give {player} netherite_ingot 1"
+    # Nota: los porcentajes son independientes entre sí.
+    # Es posible recibir varias recompensas en una sola apertura.
+
+# ── 6. Mensaje aleatorio de bienvenida ───────────────────────
+frase-aleatoria:
+  name: frase-aleatoria
+  permission: ""
+  actions:
+    - "[CHANCE] 33%;[BROADCAST] &a&l¡{player} llegó a romper todo!"
+    - "[CHANCE] 33%;[BROADCAST] &b&l{player} &bformó parte del servidor."
+    - "[CHANCE] 34%;[BROADCAST] &e&l¡Bienvenido, {player}! Que disfrutes."
+
+# ── 7. Lotería con feedback dependiendo de si ganaste ────────
+loteria:
+  name: loteria
+  permission: ""
+  cooldown: 600            # 10 minutos
+  actions:
+    - "[MESSAGE] &7Girando la ruleta..."
+    - "[CHANCE] 20%;[CONSOLE] give {player} diamond 3;[SOUND] UI_TOAST_CHALLENGE_COMPLETE"
+    - "[IF] var:ultimo_resultado=ganaste;[MESSAGE] &a¡GANASTE! Recibiste 3 diamantes."
+    # Consejo: combina CHANCE + VAR:SET para saber si ganaste o no.
+
+# ═══════════════════════ DELAY ═══════════════════════════════
+
+# ── 8. Delay simple (cuenta regresiva) ───────────────────────
+countdown:
+  name: countdown
+  permission: fccmds.admin
+  actions:
+    - "[BROADCAST] &c3..."
+    - "[DELAY] 20"          # espera 1 segundo (20 ticks)
+    - "[BROADCAST] &e2..."
+    - "[DELAY] 20"
+    - "[BROADCAST] &a1..."
+    - "[DELAY] 20"
+    - "[BROADCAST] &b&l¡YA!"
+
+# ── 9. Teletransporte con barra de carga ─────────────────────
+tp-spawn:
+  name: tp-spawn
+  permission: ""
+  actions:
+    - "[ACTIONBAR] &7Teletransportando en &e3 &7segundos... No te muevas."
+    - "[DELAY] 20"
+    - "[ACTIONBAR] &7Teletransportando en &e2 &7segundos..."
+    - "[DELAY] 20"
+    - "[ACTIONBAR] &7Teletransportando en &e1 &7segundo..."
+    - "[DELAY] 20"
+    - "[PLAYER] spawn"
+    - "[SOUND] ENTITY_ENDERMAN_TELEPORT"
+    - "[ACTIONBAR] &a¡Teletransportado!"
+
+# ── 10. Mensaje de bienvenida escalonado ─────────────────────
+bienvenida-progresiva:
+  name: bienvenida-progresiva
+  permission: ""
+  actions:
+    - "[MESSAGE] &8Cargando perfil..."
+    - "[DELAY] 40"          # 2 segundos
+    - "[MESSAGE] &7Servidor: &aonline &7| TPS: &a20.0"
+    - "[DELAY] 20"          # 1 segundo más
+    - "[MESSAGE] &e¡Bienvenido!, &f{player}&e. Usa &b/ayuda &epara empezar."

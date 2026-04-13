@@ -6,6 +6,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -15,6 +17,8 @@ public class CommandManager {
 
     private final FoliaCustomCommands plugin;
     private final Map<String, CustomCommand> registeredCommands = new HashMap<>();
+    // Nodos de permiso registrados dinámicamente (para limpiarlos al recargar)
+    private final Set<String> dynPermissions = new HashSet<>();
 
     public CommandManager(FoliaCustomCommands plugin) {
         this.plugin = plugin;
@@ -39,6 +43,7 @@ public class CommandManager {
             CustomCommand cmd = buildCommand(name, entry.getValue());
             commandMap.register(plugin.getName().toLowerCase(), cmd);
             registeredCommands.put(name, cmd);
+            registerDynPermission("fccmds.commands." + name);
             if (verbose) plugin.getLogger().info("Comando registrado: /" + name);
         }
     }
@@ -62,6 +67,7 @@ public class CommandManager {
                 CustomCommand cmd = buildCommand(name, sec);
                 commandMap.register(plugin.getName().toLowerCase(), cmd);
                 registeredCommands.put(name, cmd);
+                registerDynPermission("fccmds.commands." + name);
                 plugin.getLogger().info("Nuevo comando registrado: /" + name);
             }
         }
@@ -70,6 +76,7 @@ public class CommandManager {
         for (Map.Entry<String, CustomCommand> entry : registeredCommands.entrySet()) {
             if (!current.containsKey(entry.getKey())) {
                 entry.getValue().setDisabled(true);
+                unregisterDynPermission("fccmds.commands." + entry.getKey());
                 plugin.getLogger().info("Comando deshabilitado: /" + entry.getKey());
             }
         }
@@ -121,6 +128,28 @@ public class CommandManager {
         return file.getName().replace(".yml", "").toLowerCase();
     }
 
+    // -------------------------------------------------------------------------
+    // Gestión de permisos dinámicos (para LuckPerms y similares)
+    // ▸ PermissionDefault.TRUE  → todos los jugadores tienen el nodo salvo negación explícita
+    // ▸ Admins pueden hacer: /lp group default permission set fccmds.commands.kit false
+    // -------------------------------------------------------------------------
+    private void registerDynPermission(String node) {
+        if (dynPermissions.contains(node)) return; // ya registrado
+        try {
+            Bukkit.getPluginManager().addPermission(
+                    new Permission(node, PermissionDefault.TRUE));
+            dynPermissions.add(node);
+        } catch (IllegalArgumentException ignored) {
+            // otro plugin ya registró este nodo — lo añadimos al set igualmente
+            dynPermissions.add(node);
+        }
+    }
+
+    private void unregisterDynPermission(String node) {
+        Bukkit.getPluginManager().removePermission(node);
+        dynPermissions.remove(node);
+    }
+
     private CommandMap getCommandMap() {
         try {
             Field field = Bukkit.getServer().getClass().getDeclaredField("commandMap");
@@ -134,5 +163,15 @@ public class CommandManager {
 
     public int getCommandCount() {
         return registeredCommands.size();
+    }
+
+    /**
+     * Permite a otros sistemas (MenuManager, etc.) ejecutar una acción
+     * usando el motor de CustomCommand sin necesidad de un contexto de comando.
+     */
+    public void dispatchAction(org.bukkit.entity.Player player, String action, String[] args) {
+        // Crear un CustomCommand temporal solo para usar su processAction vía el motor
+        // Delegamos a un método estático expuesto por CustomCommand
+        dev.foliacmds.command.CustomCommand.fireAction(plugin, player, action, args);
     }
 }
