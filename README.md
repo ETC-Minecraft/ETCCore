@@ -5,6 +5,8 @@ Plugin nativo para **Folia / Paper** que permite crear comandos personalizados d
 > **Compatible con**: Paper / Folia 1.21.1+  
 > **Java**: 21+
 
+📖 **Documentación completa:** [etc-minecraft.github.io/ETCCore-Docs](https://etc-minecraft.github.io/ETCCore-Docs/)
+
 ---
 
 ## Tabla de contenidos
