@@ -20,7 +20,7 @@ import java.util.Set;
  * comprueba si un jugador (por sus grupos LuckPerms) puede ejecutar un comando.
  *
  * Flujo de comprobación:
- *   1. ¿Tiene fccmds.cmdblock.bypass? → siempre permitido.
+ *   1. ¿Tiene etccore.cmdblock.bypass? → siempre permitido.
  *   2. ¿Alguna regla coincide con el comando Y con alguno de los grupos del jugador? → bloqueado.
  *   3. En caso contrario → permitido.
  *
@@ -38,6 +38,11 @@ public class CommandBlockManager {
     private final List<BlockRule>     rules = new ArrayList<>();
     private String                    defaultMessage;
     private LuckPerms                 luckPerms;
+
+    // ── Allowlist mode ────────────────────────────────────────────────────────
+    private boolean     allowlistEnabled = false;
+    private Set<String> allowlistGroups  = new HashSet<>();
+    private String      allowlistMessage;
 
     public CommandBlockManager(FoliaCustomCommands plugin) {
         this.plugin     = plugin;
@@ -60,9 +65,21 @@ public class CommandBlockManager {
      * o {@code null} si el comando está permitido.
      */
     public String getBlockMessage(Player player, String rawCommand) {
-        if (player.hasPermission("fccmds.cmdblock.bypass")) return null;
+        if (player.hasPermission("etccore.cmdblock.bypass")) return null;
         String cmd = normalize(rawCommand);
         Set<String> groups = getPlayerGroups(player);
+
+        // ── Modo allowlist ────────────────────────────────────────────────────
+        // Si está activo y el jugador pertenece a algún grupo allowlist,
+        // solo se permite el comando si tiene etccore.allow.<comando> en LP.
+        if (allowlistEnabled && matchesAnyGroup(groups, allowlistGroups)) {
+            if (!player.hasPermission("etccore.allow." + cmd)) {
+                return allowlistMessage;
+            }
+            return null; // tiene el permiso → permitido
+        }
+
+        // ── Modo blocklist (comportamiento original) ──────────────────────────
         for (BlockRule rule : rules) {
             if (matchesAnyGroup(groups, rule.groups()) && matchesAnyPattern(cmd, rule.patterns())) {
                 return rule.message();
@@ -85,6 +102,13 @@ public class CommandBlockManager {
         rules.clear();
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(configFile);
         defaultMessage = cfg.getString("default-message", "&cNo tienes permiso para usar ese comando.");
+
+        // Allowlist
+        allowlistEnabled = cfg.getBoolean("allowlist.enabled", false);
+        allowlistMessage = cfg.getString("allowlist.message", defaultMessage);
+        allowlistGroups  = new HashSet<>();
+        List<?> alGroups = cfg.getList("allowlist.groups", List.of());
+        for (Object g : alGroups) allowlistGroups.add(g.toString().toLowerCase().trim());
 
         List<?> rawList = cfg.getList("rules", List.of());
         for (Object obj : rawList) {

@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 #   FoliaCustomCommands — blocked-commands.yml
 # ============================================================
 #
@@ -12,7 +12,7 @@
 #   "gm*"  → bloquea gamemode, gm, gmc, gms, gmsp, gmsa...
 #
 # ── Bypass ─────────────────────────────────────────────────────────────────
-# Los jugadores con el permiso fccmds.cmdblock.bypass (default: op) ignoran
+# Los jugadores con el permiso etccore.cmdblock.bypass (default: op) ignoran
 # todas las reglas de bloqueo.
 #
 # ── Formato ────────────────────────────────────────────────────────────────
@@ -69,3 +69,23 @@ rules:
       - magnetar
       - hipernova
     message: "&c¡Acceso denegado!"
+
+# ── Modo Allowlist ─────────────────────────────────────────────────────────────
+#
+# En lugar de bloquear comandos concretos, estos grupos solo pueden ejecutar
+# los comandos para los que tengan un permiso de LuckPerms.
+#
+# Permiso que se comprueba: etccore.allow.<comando>
+#   Ejemplo: para que el grupo "default" pueda usar /spawn, dale en LP:
+#     etccore.allow.spawn: true
+#
+# Los jugadores con etccore.cmdblock.bypass siguen ignorando todo el sistema.
+#
+# enabled: false → el bloque allowlist está desactivado (modo blocklist normal).
+# enabled: true  → los grupos listados solo pueden usar lo que tengan en LP.
+#
+allowlist:
+  enabled: false
+  groups:
+    - default
+  message: "&cNo tienes permiso para usar ese comando."

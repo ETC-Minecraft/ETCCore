@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 #   ETCCore — config.yml
 # ============================================================
 #
@@ -12,7 +12,7 @@ auto-reload: true
 # Update checker
 # ────────────────────────────
 # Verifica si hay una versión nueva en GitHub al iniciar el servidor.
-# Solo notifica a jugadores con fccmds.admin al unirse. Nunca molesta a jugadores normales.
+# Solo notifica a jugadores con etccore.admin al unirse. Nunca molesta a jugadores normales.
 update-checker: true
 
 # ────────────────────────────
@@ -25,7 +25,7 @@ log-commands: false
 # ────────────────────────────
 # Protección de construcción
 # ────────────────────────────
-# Activa el sistema que bloquea colocar/romper bloques a jugadores sin fccmds.build.
+# Activa el sistema que bloquea colocar/romper bloques a jugadores sin etccore.build.
 # true  = activo (recomendado para servidores con grupo default sin acceso)
 # false = desactivado (usa otro plugin para gestionar esto)
 build-protection: true
@@ -37,7 +37,7 @@ build-protection-message: "&cNecesitas ser aprobado para construir o romper bloq
 # ────────────────────────────
 # Protección de ítems
 # ────────────────────────────
-# Activa el sistema que bloquea tirar y recoger ítems a jugadores sin fccmds.items.
+# Activa el sistema que bloquea tirar y recoger ítems a jugadores sin etccore.items.
 item-protection: true
 
 # Mensaje en la action bar cuando el jugador intenta tirar un ítem sin permiso.

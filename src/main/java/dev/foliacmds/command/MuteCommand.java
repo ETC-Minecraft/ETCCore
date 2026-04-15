@@ -41,7 +41,7 @@ public class MuteCommand implements CommandExecutor, TabCompleter {
     // ── /mute ────────────────────────────────────────────────────────────────
 
     private boolean handleMute(CommandSender sender, String[] args) {
-        if (!sender.hasPermission("fccmds.mute")) {
+        if (!sender.hasPermission("etccore.mute")) {
             send(sender, "&cNo tienes permiso.");
             return true;
         }
@@ -110,7 +110,7 @@ public class MuteCommand implements CommandExecutor, TabCompleter {
     // ── /unmute ───────────────────────────────────────────────────────────────
 
     private boolean handleUnmute(CommandSender sender, String[] args) {
-        if (!sender.hasPermission("fccmds.mute")) {
+        if (!sender.hasPermission("etccore.mute")) {
             send(sender, "&cNo tienes permiso.");
             return true;
         }

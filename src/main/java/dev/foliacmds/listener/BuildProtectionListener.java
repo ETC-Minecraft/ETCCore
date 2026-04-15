@@ -14,21 +14,21 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 
 /**
- * Protección de construcción basada en el nodo de permiso "fccmds.build".
+ * Protección de construcción basada en el nodo de permiso "etccore.build".
  *
  * Uso en LuckPerms:
  *   • El nodo viene con default: op en plugin.yml → por defecto solo OPs construyen.
  *   • Para dar acceso al grupo aprobado:
- *       /lp group cometa permission set fccmds.build true
+ *       /lp group cometa permission set etccore.build true
  *
  * Se puede desactivar en config.yml:
  *   build-protection: false
  */
 public class BuildProtectionListener implements Listener {
 
-    private static final String PERM        = "fccmds.build";
-    private static final String PERM_BYPASS = "fccmds.build.bypass";
-    private static final String PERM_ITEMS  = "fccmds.items";
+    private static final String PERM        = "etccore.build";
+    private static final String PERM_BYPASS = "etccore.build.bypass";
+    private static final String PERM_ITEMS  = "etccore.items";
 
     private final FoliaCustomCommands plugin;
 

@@ -242,7 +242,7 @@ public class CustomCommand extends Command {
             if (close < 0) return;
             String condition = action.substring(4, close).trim();
             String remaining = action.substring(close + 1).trim();
-            if (evalCondition(condition, sender, player)) {
+            if (evalCondition(condition, sender, player, args)) {
                 processAction(sender, player, remaining, args);
             }
             return;
@@ -462,7 +462,7 @@ public class CustomCommand extends Command {
     // -------------------------------------------------------------------------
     // Evaluación de condiciones para [IF]
     // -------------------------------------------------------------------------
-    private boolean evalCondition(String condition, CommandSender sender, Player player) {
+    private boolean evalCondition(String condition, CommandSender sender, Player player, String[] args) {
         boolean negate = condition.startsWith("!");
         if (negate) condition = condition.substring(1).trim();
 
@@ -487,12 +487,46 @@ public class CustomCommand extends Command {
             result = evalMoneyCondition(condition, player);
         } else if (condition.startsWith("var:")) {
             result = evalVarCondition(condition.substring("var:".length()), player);
+        } else if (condition.startsWith("arg:")) {
+            // arg:N!=      → args[N] existe y no está vacío
+            // arg:N!=valor → args[N] != "valor"
+            // arg:N=valor  → args[N] == "valor"
+            result = evalArgCondition(condition.substring("arg:".length()), args);
         } else {
             plugin.getLogger().warning("Condición desconocida en [IF]: " + condition);
             result = false;
         }
 
         return negate != result; // XOR para negación
+    }
+
+    /**
+     * Evalúa condiciones sobre argumentos: arg:N!=  arg:N!=valor  arg:N=valor
+     *   arg:0!=       → args[0] existe y no está vacío
+     *   arg:0!=Emma   → args[0] != "Emma" (ignorando mayúsculas)
+     *   arg:0=Emma    → args[0] == "Emma" (ignorando mayúsculas)
+     */
+    private boolean evalArgCondition(String expr, String[] args) {
+        if (expr.contains("!=")) {
+            String[] p = expr.split("!=", 2);
+            int idx;
+            try { idx = Integer.parseInt(p[0].trim()); } catch (NumberFormatException e) { return false; }
+            String argVal = idx < args.length ? args[idx] : "";
+            String expected = p[1].trim();
+            // arg:0!=  sin valor → comprueba que existe y no está vacío
+            return expected.isEmpty() ? !argVal.isEmpty() : !argVal.equalsIgnoreCase(expected);
+        } else if (expr.contains("=")) {
+            String[] p = expr.split("=", 2);
+            int idx;
+            try { idx = Integer.parseInt(p[0].trim()); } catch (NumberFormatException e) { return false; }
+            String argVal = idx < args.length ? args[idx] : "";
+            return argVal.equalsIgnoreCase(p[1].trim());
+        }
+        // arg:0  solo → verdadero si existe y no está vacío
+        try {
+            int idx = Integer.parseInt(expr.trim());
+            return idx < args.length && !args[idx].isEmpty();
+        } catch (NumberFormatException e) { return false; }
     }
 
     /** Evaluates Vault economy conditions: money>=X, money<=X, money>X, money<X */

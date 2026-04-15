@@ -29,7 +29,7 @@ import java.util.logging.Level;
  * Actions requiring a player context ([MESSAGE], [TITLE], [SOUND], etc.)
  * are silently skipped since there is no player associated with a global task.
  *
- * Reload with /fccmds reload.
+ * Reload with /etccore reload.
  */
 public class ScheduledTaskManager {
 

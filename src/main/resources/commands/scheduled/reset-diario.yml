@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 #   Tarea programada de ejemplo — reset-diario.yml
 # ============================================================
 #
@@ -12,7 +12,7 @@
 # NOTA: Acciones que requieren un jugador ([MESSAGE], [TITLE], [SOUND], etc.)
 #       no funcionan aquí porque no hay jugador asociado. Úsalas en comandos YAML normales.
 #
-# Recarga con: /fccmds reload
+# Recarga con: /etccore reload
 # ============================================================
 
 # Activar/desactivar esta tarea sin borrar el archivo

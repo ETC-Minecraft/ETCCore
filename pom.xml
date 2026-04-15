@@ -33,6 +33,11 @@
             <id>opencollab-releases</id>
             <url>https://repo.opencollab.dev/main/</url>
         </repository>
+        <!-- PlaceholderAPI -->
+        <repository>
+            <id>placeholderapi</id>
+            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -62,6 +67,13 @@
             <groupId>org.geysermc.floodgate</groupId>
             <artifactId>api</artifactId>
             <version>2.2.3-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- PlaceholderAPI (soft-dependency) -->
+        <dependency>
+            <groupId>me.clip</groupId>
+            <artifactId>placeholderapi</artifactId>
+            <version>2.11.6</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

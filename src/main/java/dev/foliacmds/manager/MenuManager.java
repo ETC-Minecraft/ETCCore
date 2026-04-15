@@ -81,7 +81,7 @@ public class MenuManager implements Listener {
             YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
             MenuDefinition def = parseMenu(name, cfg);
             menus.put(name, def);
-            registerDynPermission("fccmds.menus." + name);
+            registerDynPermission("etccore.menus." + name);
         }
         plugin.getLogger().info("Menús cargados: " + menus.size());
     }

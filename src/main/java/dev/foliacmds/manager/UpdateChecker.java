@@ -15,14 +15,14 @@ import java.util.logging.Level;
 
 /**
  * Checks GitHub Releases API for a newer version of ETCCore.
- * Only notifies online players with fccmds.admin permission, never regular players.
+ * Only notifies online players with etccore.admin permission, never regular players.
  * All HTTP calls are async — never blocks the main thread.
  */
 public class UpdateChecker implements Listener {
 
     private static final String API_URL =
             "https://api.github.com/repos/ETC-Minecraft/ETCCore/releases/latest";
-    private static final String PERM = "fccmds.admin";
+    private static final String PERM = "etccore.admin";
 
     private final JavaPlugin plugin;
     private volatile String  latestVersion  = null;

@@ -21,9 +21,9 @@ import java.util.Objects;
 /**
  * Controla quién puede hablar en el chat y da formato con LuckPerms + PAPI.
  *
- *   1. Permiso LP:    fccmds.chat default true → denegar silencia vía LP.
+ *   1. Permiso LP:    etccore.chat default true → denegar silencia vía LP.
  *   2. Mute manual:   /mute <jugador>
- *   3. Formato:       cargado desde chat-format.yml, recargable con /fccmds reload.
+ *   3. Formato:       cargado desde chat-format.yml, recargable con /etccore reload.
  *                     Soporta {prefix}, {player}, {suffix}, {world}, {message} y %papi%.
  */
 public class ChatProtectionListener implements Listener {
@@ -59,7 +59,7 @@ public class ChatProtectionListener implements Listener {
     public void onChatCheck(AsyncChatEvent event) {
         Player player = event.getPlayer();
 
-        if (!player.hasPermission("fccmds.chat")) {
+        if (!player.hasPermission("etccore.chat")) {
             event.setCancelled(true);
             player.sendMessage(LEGACY.deserialize("&cNo tienes permiso para chatear en este servidor."));
             return;

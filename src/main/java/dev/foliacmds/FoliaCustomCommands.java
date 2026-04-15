@@ -4,9 +4,12 @@ import dev.foliacmds.command.EnderChestCommand;
 import dev.foliacmds.command.InvSeeCommand;
 import dev.foliacmds.command.MuteCommand;
 import dev.foliacmds.command.ReloadCommand;
+import dev.foliacmds.command.VanishCommand;
+import dev.foliacmds.manager.VanishManager;
 import dev.foliacmds.listener.BuildProtectionListener;
 import dev.foliacmds.listener.ChatProtectionListener;
 import dev.foliacmds.listener.CommandBlockListener;
+import dev.foliacmds.listener.VanishListener;
 import dev.foliacmds.manager.ChatInputManager;
 import dev.foliacmds.manager.CommandBlockManager;
 import dev.foliacmds.manager.CommandLogger;
@@ -17,6 +20,7 @@ import dev.foliacmds.manager.MenuManager;
 import dev.foliacmds.manager.MuteManager;
 import dev.foliacmds.manager.PlayerDataManager;
 import dev.foliacmds.manager.ScheduledTaskManager;
+import dev.foliacmds.manager.ETCCorePlaceholders;
 import dev.foliacmds.manager.UpdateChecker;
 import dev.foliacmds.manager.VaultManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -40,6 +44,7 @@ public final class FoliaCustomCommands extends JavaPlugin {
     private UpdateChecker            updateChecker;
     private CommandLogger            commandLogger;
     private ScheduledTaskManager     scheduledTaskManager;
+    private VanishManager            vanishManager;
 
     @Override
     public void onEnable() {
@@ -47,6 +52,8 @@ public final class FoliaCustomCommands extends JavaPlugin {
         saveDefaultCommands();
 
         // ── Core managers ────────────────────────────────────────────────────
+        vanishManager        = new VanishManager(this);
+        vanishManager.startSyncTask();
         cooldownManager      = new CooldownManager();
         playerDataManager    = new PlayerDataManager(this);
         chatInputManager     = new ChatInputManager(this);
@@ -73,6 +80,21 @@ public final class FoliaCustomCommands extends JavaPlugin {
 
         if (getConfig().getBoolean("build-protection", true)) {
             getServer().getPluginManager().registerEvents(new BuildProtectionListener(this), this);
+        }
+
+        // Vanish: ocultar del MOTD, TAB y manejar eventos de join/quit
+        getServer().getPluginManager().registerEvents(new VanishListener(this), this);
+
+        var vanishCmd = getCommand("vanish");
+        if (vanishCmd != null) {
+            VanishCommand vc = new VanishCommand(this);
+            vanishCmd.setExecutor(vc);
+            vanishCmd.setTabCompleter(vc);
+        }
+
+        // ── PlaceholderAPI expansion ─────────────────────────────────────────
+        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new ETCCorePlaceholders(this).register();
         }
 
         // ── Update checker ───────────────────────────────────────────────────
@@ -107,7 +129,7 @@ public final class FoliaCustomCommands extends JavaPlugin {
             unmuteCmd.setTabCompleter(mc);
         }
 
-        var fccCmd = getCommand("fccmds");
+        var fccCmd = getCommand("etccore");
         if (fccCmd != null) {
             ReloadCommand rc = new ReloadCommand(this);
             fccCmd.setExecutor(rc);
@@ -182,5 +204,6 @@ public final class FoliaCustomCommands extends JavaPlugin {
     public VaultManager            getVaultManager()            { return vaultManager; }
     public CommandLogger           getCommandLogger()           { return commandLogger; }
     public ScheduledTaskManager    getScheduledTaskManager()    { return scheduledTaskManager; }
+    public VanishManager           getVanishManager()           { return vanishManager; }
 }
 

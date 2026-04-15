@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 #  EJEMPLO 03 — VARIABLES [VAR]
 #  Guarda datos por jugador de forma persistente.
 #  Los datos se mantienen incluso si el jugador se desconecta.
@@ -17,7 +17,7 @@
 # ── 1. Asignar un valor fijo ──────────────────────────────────
 iniciar-rango:
   name: iniciar-rango
-  permission: fccmds.admin
+  permission: etccore.admin
   actions:
     - "[VAR:SET] rango Novato"
     - "[MESSAGE] &7Tu rango fue establecido a: &e{var:rango}"
@@ -48,7 +48,7 @@ gastar-puntos:
 # ── 5. Expresión matemática con otra variable ─────────────────
 doblar-puntos:
   name: doblar-puntos
-  permission: fccmds.admin
+  permission: etccore.admin
   actions:
     # {var:puntos}*2 → multiplica el valor actual por 2
     - "[VAR:SET] puntos {var:puntos}*2"
@@ -57,7 +57,7 @@ doblar-puntos:
 # ── 6. Eliminar una variable ─────────────────────────────────
 reset-datos:
   name: reset-datos
-  permission: fccmds.admin
+  permission: etccore.admin
   actions:
     - "[VAR:DEL] rango"
     - "[VAR:DEL] puntos"
@@ -88,7 +88,7 @@ avanzar-mision:
 # (típico para pasar el valor a otro plugin)
 aplicar-rango-luckperms:
   name: aplicar-rango-luckperms
-  permission: fccmds.admin
+  permission: etccore.admin
   actions:
     - "[IF] var:rango!=;[CONSOLE] lp user {player} parent set {var:rango};[MESSAGE] &cEste jugador no tiene rango definido."
     - "[MESSAGE] &aRango &e{var:rango} &aaplicado en LuckPerms."

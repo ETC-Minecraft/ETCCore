@@ -1,4 +1,4 @@
-# ════════════════════════════════════════════════════════════
+﻿# ════════════════════════════════════════════════════════════
 #  SISTEMA DE MISIONES — EJEMPLO AVANZADO COMPLETO
 #
 #  Demuestra TODO el plugin en conjunto:
@@ -195,7 +195,7 @@ perfil:
 # ──────────────────────────────────────────────────────────
 admin-mision:
   name: admin-mision
-  permission: fccmds.admin
+  permission: etccore.admin
   arg-types:
     0: player
   actions:
@@ -215,7 +215,7 @@ admin-mision:
 # ──────────────────────────────────────────────────────────
 evento-global:
   name: evento-global
-  permission: fccmds.admin
+  permission: etccore.admin
   global-cooldown: 3600
   actions:
     - "[BROADCAST] &6&l★ EVENTO ★ &f{player} &7activó el evento. ¡Participa!"

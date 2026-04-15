@@ -1,9 +1,9 @@
-# ============================================================
+﻿# ============================================================
 #   FoliaCustomCommands — chat-format.yml
 # ============================================================
 #
 # Controla el aspecto de los mensajes de chat.
-# Se recarga con /fccmds reload.
+# Se recarga con /etccore reload.
 #
 # ── Placeholders disponibles ────────────────────────────────
 #

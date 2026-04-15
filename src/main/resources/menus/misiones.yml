@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 #  MENÚ DE MISIONES — parte del sistema avanzado
 #  Se abre con /misiones
 # ============================================================
@@ -6,7 +6,7 @@
 title: "&8☰ &b&lMisiones Disponibles"
 rows: 3
 # permission: ""   ← cualquier jugador puede ver las misiones
-# Para restringirlo: permission: fccmds.menus.misiones
+# Para restringirlo: permission: etccore.menus.misiones
 
 items:
 

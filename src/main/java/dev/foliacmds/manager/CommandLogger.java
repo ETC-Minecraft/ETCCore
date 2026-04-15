@@ -38,7 +38,7 @@ public class CommandLogger {
         this.enabled = plugin.getConfig().getBoolean("log-commands", false);
     }
 
-    /** Call after /fccmds reload to pick up config changes. */
+    /** Call after /etccore reload to pick up config changes. */
     public void reload() {
         this.enabled = plugin.getConfig().getBoolean("log-commands", false);
     }

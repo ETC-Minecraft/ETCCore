@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 #  EJEMPLO 05 — INPUT + ARG-TYPES (AUTOCOMPLETADO)
 # ============================================================
 
@@ -75,18 +75,18 @@ ver-perfil:
 # ── 6. Dar puntos a otro jugador (2 argumentos) ──────────────
 dar-puntos:
   name: dar-puntos
-  permission: fccmds.admin
+  permission: etccore.admin
   arg-types:
     0: player              # nombre del jugador
     1: cantidad            # segundo argumento (se muestra "cantidad" como hint)
   actions:
-    - "[IF] arg:0!=;[CONSOLE] fccmds-setvar {arg:0} puntos {arg:1};[MESSAGE] &cUso: /dar-puntos <jugador> <cantidad>"
+    - "[IF] arg:0!=;[CONSOLE] etccore-setvar {arg:0} puntos {arg:1};[MESSAGE] &cUso: /dar-puntos <jugador> <cantidad>"
     - "[MESSAGE] &aDiste &e{arg:1} puntos &aa &e{arg:0}&a."
 
 # ── 7. Teleport a jugador (solo tab-complete, sin más lógica) ──
 tp-a:
   name: tp-a
-  permission: fccmds.admin
+  permission: etccore.admin
   arg-types:
     0: player
   actions:

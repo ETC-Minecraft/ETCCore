@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 #  EJEMPLO 02 — CONDICIONES [IF]
 #  Comprueba permisos, mundo, vida, hambre, modo de juego
 #  y variables propias antes de ejecutar acciones
@@ -12,7 +12,7 @@ volar:
   name: volar
   permission: ""
   actions:
-    - "[IF] permission:fccmds.vip;[PLAYER] fly;[MESSAGE] &cNecesitas ser VIP para volar."
+    - "[IF] permission:etccore.vip;[PLAYER] fly;[MESSAGE] &cNecesitas ser VIP para volar."
 
 # ── 2. Comprobar mundo ───────────────────────────────────────
 portal-pvp:
@@ -49,7 +49,7 @@ comer:
 # ── 6. Comprobar modo de juego exacto ───────────────────────
 modo-creativo:
   name: modo-creativo
-  permission: fccmds.admin
+  permission: etccore.admin
   actions:
     - "[IF] gamemode:SURVIVAL;[PLAYER] gamemode creative;[MESSAGE] &cYa estás en creativo."
 

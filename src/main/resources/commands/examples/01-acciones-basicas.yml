@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 #  EJEMPLO 01 — ACCIONES BÁSICAS
 #  Muestra cada tipo de acción de forma individual
 # ============================================================
@@ -31,14 +31,14 @@ ir-spawn:
 # ── 4. Ejecutar comando como consola (OP) ────────────────────
 curar:
   name: curar
-  permission: fccmds.admin
+  permission: etccore.admin
   actions:
     - "[CONSOLE] heal {player}"   # cura al jugador que usó el comando
 
 # ── 5. Broadcast al servidor entero ──────────────────────────
 anuncio:
   name: anuncio
-  permission: fccmds.admin
+  permission: etccore.admin
   actions:
     - "[BROADCAST] &c&lAVISO &8» &f{player} ha hecho un anuncio."
 

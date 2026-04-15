@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 #  EJEMPLO 04 — COOLDOWNS + CHANCE + DELAY
 # ============================================================
 # cooldown: N        → el jugador debe esperar N segundos entre usos
@@ -33,7 +33,7 @@ me-accion:
 # ── 3. Global cooldown (comparte cooldown entre todos) ───────
 evento-global:
   name: evento-global
-  permission: "fccmds.evento"
+  permission: "etccore.evento"
   global-cooldown: 3600    # 1 hora desde que CUALQUIER jugador lo use
   actions:
     - "[BROADCAST] &6&l★ EVENTO ★ &e{player} &7activó el evento. ¡Participa!"
@@ -46,7 +46,7 @@ votekick:
   permission: ""
   cooldown: 300            # 5 minutos entre votaciones por jugador
   actions:
-    - "[IF] permission:fccmds.vip;[BROADCAST] &e{player} &7inició una votación.;[MESSAGE] &cNecesitas VIP para iniciar votaciones."
+    - "[IF] permission:etccore.vip;[BROADCAST] &e{player} &7inició una votación.;[MESSAGE] &cNecesitas VIP para iniciar votaciones."
 
 # ═══════════════════════ CHANCE ══════════════════════════════
 
@@ -88,7 +88,7 @@ loteria:
 # ── 8. Delay simple (cuenta regresiva) ───────────────────────
 countdown:
   name: countdown
-  permission: fccmds.admin
+  permission: etccore.admin
   actions:
     - "[BROADCAST] &c3..."
     - "[DELAY] 20"          # espera 1 segundo (20 ticks)

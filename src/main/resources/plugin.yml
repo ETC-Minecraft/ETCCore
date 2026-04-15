@@ -1,4 +1,4 @@
-name: ETCCore
+﻿name: ETCCore
 version: ${project.version}
 main: dev.foliacmds.FoliaCustomCommands
 api-version: "1.21"
@@ -9,60 +9,70 @@ website: https://github.com/ETC-Minecraft/ETCCore
 soft-depend: [LuckPerms, PlaceholderAPI, Vault, floodgate]
 
 commands:
-  fccmds:
+  etccore:
     description: Administración de ETCCore
-    usage: /fccmds <reload|onlinemode>
+    usage: /etccore <reload|onlinemode>
     aliases: [etccore, ecc]
-    permission: fccmds.admin
+    permission: etccore.admin
   enderchest:
     description: Abre tu enderchest o el de otro jugador
     usage: /enderchest [jugador]
-    permission: fccmds.enderchest
+    permission: etccore.enderchest
   invsee:
     description: Ve y edita el inventario de otro jugador (online u offline)
     usage: /invsee <jugador>
-    permission: fccmds.invsee
+    permission: etccore.invsee
   mute:
     description: Silencia a un jugador (temporal o permanente)
     usage: /mute <jugador> [duración] [razón]
-    permission: fccmds.mute
+    permission: etccore.mute
   unmute:
     description: Quita el silencio a un jugador
     usage: /unmute <jugador>
-    permission: fccmds.mute
+    permission: etccore.mute
+  vanish:
+    description: Activa o desactiva el vanish de un jugador
+    usage: /vanish [jugador]
+    permission: etccore.vanish
 
 permissions:
-  fccmds.admin:
+  etccore.admin:
     description: Permite recargar la configuración del plugin
     default: op
-  fccmds.enderchest:
+  etccore.staff:
+    description: Marca al jugador como staff. Usado por %etccore_staffonline% de PlaceholderAPI.
+    default: op
+  etccore.vanish:
+    description: Permite usar /vanish y ver jugadores en vanish en el TAB.
+    default: op
+  etccore.enderchest:
     description: Permite abrir tu propio enderchest con /enderchest
     default: true
-  fccmds.enderchest.others:
+  etccore.enderchest.others:
     description: Permite ver el enderchest de otros jugadores con /enderchest <jugador>
     default: op
-  fccmds.invsee:
+  etccore.invsee:
     description: Permite ver inventarios de jugadores online con /invsee
     default: op
-  fccmds.invsee.offline:
+  etccore.invsee.offline:
     description: Permite ver inventarios de jugadores offline con /invsee
     default: op
-  fccmds.build:
+  etccore.build:
     description: Permite colocar y romper bloques. Asigna este nodo al grupo aprobado.
     default: op
-  fccmds.build.bypass:
+  etccore.build.bypass:
     description: Ignora completamente la protección de construcción (admins, staff).
     default: op
-  fccmds.items:
+  etccore.items:
     description: Permite tirar y recoger ítems del suelo.
     default: op
-  fccmds.chat:
+  etccore.chat:
     description: Permite enviar mensajes al chat. Deniega con LP para silenciar por permiso.
     default: true
-  fccmds.mute:
+  etccore.mute:
     description: Permite silenciar y dessilenciar jugadores con /mute y /unmute.
     default: op
-  fccmds.cmdblock.bypass:
+  etccore.cmdblock.bypass:
     description: Ignora todas las reglas de blocked-commands.yml (admins, staff).
     default: op
 

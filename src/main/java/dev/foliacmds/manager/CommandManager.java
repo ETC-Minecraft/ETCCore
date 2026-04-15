@@ -43,7 +43,7 @@ public class CommandManager {
             CustomCommand cmd = buildCommand(name, entry.getValue());
             commandMap.register(plugin.getName().toLowerCase(), cmd);
             registeredCommands.put(name, cmd);
-            registerDynPermission("fccmds.commands." + name);
+            registerDynPermission("etccore.commands." + name);
             if (verbose) plugin.getLogger().info("Comando registrado: /" + name);
         }
     }
@@ -67,7 +67,7 @@ public class CommandManager {
                 CustomCommand cmd = buildCommand(name, sec);
                 commandMap.register(plugin.getName().toLowerCase(), cmd);
                 registeredCommands.put(name, cmd);
-                registerDynPermission("fccmds.commands." + name);
+                registerDynPermission("etccore.commands." + name);
                 plugin.getLogger().info("Nuevo comando registrado: /" + name);
             }
         }
@@ -76,7 +76,7 @@ public class CommandManager {
         for (Map.Entry<String, CustomCommand> entry : registeredCommands.entrySet()) {
             if (!current.containsKey(entry.getKey())) {
                 entry.getValue().setDisabled(true);
-                unregisterDynPermission("fccmds.commands." + entry.getKey());
+                unregisterDynPermission("etccore.commands." + entry.getKey());
                 plugin.getLogger().info("Comando deshabilitado: /" + entry.getKey());
             }
         }
@@ -131,7 +131,7 @@ public class CommandManager {
     // -------------------------------------------------------------------------
     // Gestión de permisos dinámicos (para LuckPerms y similares)
     // ▸ PermissionDefault.TRUE  → todos los jugadores tienen el nodo salvo negación explícita
-    // ▸ Admins pueden hacer: /lp group default permission set fccmds.commands.kit false
+    // ▸ Admins pueden hacer: /lp group default permission set etccore.commands.kit false
     // -------------------------------------------------------------------------
     private void registerDynPermission(String node) {
         if (dynPermissions.contains(node)) return; // ya registrado

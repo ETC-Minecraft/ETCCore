@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 #   Menú de ejemplo — tienda.yml
 # ============================================================
 #
@@ -9,17 +9,17 @@
 #   {var:puntos}  — puntos del jugador (ver vars en CustomCommand)
 #
 # Permiso:
-#   permission: fccmds.menus.tienda   (vacío = todos pueden abrir)
+#   permission: etccore.menus.tienda   (vacío = todos pueden abrir)
 #
 # Los jugadores acumulan puntos con comandos YAML que usen:
 #   [VAR:ADD] puntos 10
 #
-# Recarga:  /fccmds reload
+# Recarga:  /etccore reload
 # ============================================================
 
 title: "&2&l💰 Tienda de puntos"
 rows: 4
-permission: "fccmds.menus.tienda"
+permission: "etccore.menus.tienda"
 
 items:
 

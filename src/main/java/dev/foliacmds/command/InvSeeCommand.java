@@ -29,8 +29,8 @@ import java.util.concurrent.ConcurrentHashMap;
  *                       Funciona tanto online como offline.
  *
  * Permisos:
- *   fccmds.invsee           — Acceso al comando
- *   fccmds.invsee.offline   — Ver/editar jugadores offline
+ *   etccore.invsee           — Acceso al comando
+ *   etccore.invsee.offline   — Ver/editar jugadores offline
  *
  * El inventario se muestra como un cofre de 54 slots:
  *   slots  0-35  → inventario principal (filas 4-1 del jugador, de abajo hacia arriba)
@@ -41,8 +41,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class InvSeeCommand implements CommandExecutor, TabCompleter, Listener {
 
-    private static final String PERM      = "fccmds.invsee";
-    private static final String PERM_OFF  = "fccmds.invsee.offline";
+    private static final String PERM      = "etccore.invsee";
+    private static final String PERM_OFF  = "etccore.invsee.offline";
     private static final int    INV_SIZE  = 54;
 
     private final FoliaCustomCommands plugin;

@@ -25,8 +25,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * /enderchest              — Abre tu propio enderchest  (fccmds.enderchest)
- * /enderchest <jugador>    — Abre el enderchest de otro (fccmds.enderchest.others)
+ * /enderchest              — Abre tu propio enderchest  (etccore.enderchest)
+ * /enderchest <jugador>    — Abre el enderchest de otro (etccore.enderchest.others)
  *                            Funciona tanto con jugadores online como offline.
  *                            Los cambios hechos a jugadores offline se guardan al cerrar.
  *
@@ -36,8 +36,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class EnderChestCommand implements CommandExecutor, TabCompleter, Listener {
 
-    private static final String PERM_SELF   = "fccmds.enderchest";
-    private static final String PERM_OTHERS = "fccmds.enderchest.others";
+    private static final String PERM_SELF   = "etccore.enderchest";
+    private static final String PERM_OTHERS = "etccore.enderchest.others";
 
     private final FoliaCustomCommands plugin;
 

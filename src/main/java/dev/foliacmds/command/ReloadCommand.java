@@ -22,13 +22,13 @@ public class ReloadCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage("§eUso: §f/fccmds reload §7| §f/fccmds onlinemode [true|false]");
+            sender.sendMessage("§eUso: §f/etccore reload §7| §f/etccore onlinemode [true|false]");
             return true;
         }
 
         switch (args[0].toLowerCase()) {
 
-            // ── /fccmds reload ─────────────────────────────────────────────
+            // ── /etccore reload ─────────────────────────────────────────────
             case "reload" -> {
                 plugin.getServer().getGlobalRegionScheduler().execute(plugin, () -> {
                     plugin.getCommandManager().reload();
@@ -43,9 +43,9 @@ public class ReloadCommand implements CommandExecutor, TabCompleter {
                 });
             }
 
-            // ── /fccmds onlinemode ─────────────────────────────────────────
+            // ── /etccore onlinemode ─────────────────────────────────────────
             case "onlinemode" -> {
-                if (!sender.hasPermission("fccmds.admin")) {
+                if (!sender.hasPermission("etccore.admin")) {
                     sender.sendMessage("§cNo tienes permiso.");
                     return true;
                 }
@@ -55,7 +55,7 @@ public class ReloadCommand implements CommandExecutor, TabCompleter {
                     boolean current = Bukkit.getServer().getOnlineMode();
                     sender.sendMessage("§8[§bFCC§8] Online-mode actual: "
                             + (current ? "§aON (premium)": "§cOFF (sin autenticación)"));
-                    sender.sendMessage("§7Uso: §f/fccmds onlinemode <true|false>");
+                    sender.sendMessage("§7Uso: §f/etccore onlinemode <true|false>");
                     return true;
                 }
 
@@ -73,7 +73,7 @@ public class ReloadCommand implements CommandExecutor, TabCompleter {
                         String estado = target ? "§aON §7(solo cuentas premium pueden entrar)"
                                                : "§cOFF §7(cualquier cliente puede entrar)";
                         sender.sendMessage("§8[§bFCC§8] Online-mode cambiado a: " + estado);
-                        sender.sendMessage("§7Afecta solo a nuevas conexiones. Usa §f/fccmds onlinemode " + !target + "§7 para revertir.");
+                        sender.sendMessage("§7Afecta solo a nuevas conexiones. Usa §f/etccore onlinemode " + !target + "§7 para revertir.");
                         plugin.getLogger().warning("Online-mode cambiado a " + target + " por " + sender.getName());
                     } catch (Exception e) {
                         sender.sendMessage("§cError al cambiar online-mode: " + e.getMessage());
@@ -82,7 +82,7 @@ public class ReloadCommand implements CommandExecutor, TabCompleter {
                 });
             }
 
-            default -> sender.sendMessage("§eUso: §f/fccmds reload §7| §f/fccmds onlinemode [true|false]");
+            default -> sender.sendMessage("§eUso: §f/etccore reload §7| §f/etccore onlinemode [true|false]");
         }
 
         return true;
@@ -90,7 +90,7 @@ public class ReloadCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (!sender.hasPermission("fccmds.admin")) return List.of();
+        if (!sender.hasPermission("etccore.admin")) return List.of();
         if (args.length == 1) return List.of("reload", "onlinemode");
         if (args.length == 2 && args[0].equalsIgnoreCase("onlinemode")) return List.of("true", "false");
         return List.of();
