@@ -1,0 +1,36 @@
+# ============================================================
+#   ETCCore — on-join.yml
+# ============================================================
+
+on-join:
+  enabled: false
+  only-groups: []
+  always-actions: []
+  first-join-actions:
+    - "[CONSOLE] lobby {player}"
+    - "[MESSAGE] &aBienvenido, esta es tu primera vez en el servidor."
+
+join-rules:
+  default-lobby:
+    enabled: true
+    only-groups: ["default"]
+    always-actions:
+      - "[CONSOLE] lobby {player}"
+    first-join-actions:
+      - "[MESSAGE] &aBienvenido Ente, esta es tu primera vez en el servidor."
+
+  terricolas-pan:
+    enabled: true
+    only-groups: ["terricolas"]
+    cooldown-seconds: 30
+    always-actions:
+      - "[CONSOLE] give {player} bread 1"
+    first-join-actions: []
+
+  quitar-fly-default:
+    enabled: false
+    only-groups: ["default"]
+    delay-ticks: 20
+    always-actions:
+      - "[FLY:OFF]"
+    first-join-actions: []

@@ -51,7 +51,9 @@ public class JoinCommandListener implements Listener {
     }
 
     private List<JoinRule> loadRules() {
-        ConfigurationSection rulesSection = plugin.getConfig().getConfigurationSection("join-rules");
+        ConfigurationSection rulesSection = plugin.getFeatureConfigManager()
+                .getOnJoinConfig()
+                .getConfigurationSection("join-rules");
         if (rulesSection != null && !rulesSection.getKeys(false).isEmpty()) {
             List<JoinRule> rules = new ArrayList<>();
             for (String key : rulesSection.getKeys(false)) {
@@ -63,7 +65,9 @@ public class JoinCommandListener implements Listener {
             return rules;
         }
 
-        ConfigurationSection legacySection = plugin.getConfig().getConfigurationSection("on-join");
+        ConfigurationSection legacySection = plugin.getFeatureConfigManager()
+            .getOnJoinConfig()
+            .getConfigurationSection("on-join");
         if (legacySection == null) {
             return Collections.emptyList();
         }

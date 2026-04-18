@@ -34,6 +34,126 @@ commands:
     description: Activa o desactiva el vanish de un jugador
     usage: /vanish [jugador]
     permission: etccore.vanish
+  home:
+    description: Teletransporte a homes propios
+    usage: /home [nombre]
+    aliases: [homes, homelist]
+    permission: etccore.home
+  sethome:
+    description: Guarda o edita un home
+    usage: /sethome <nombre>
+    aliases: [edithome]
+    permission: etccore.sethome
+  delhome:
+    description: Elimina un home propio
+    usage: /delhome <nombre>
+    permission: etccore.delhome
+  publichome:
+    description: Gestiona o visita public homes
+    usage: /publichome <jugador> <home>
+    permission: etccore.publichome
+  publichomelist:
+    description: Lista public homes
+    usage: /publichomelist [jugador]
+    permission: etccore.publichome
+  warp:
+    description: Teletransporte a warps
+    usage: /warp [nombre]
+    aliases: [warps, warplist]
+    permission: etccore.warp
+  setwarp:
+    description: Crea o edita warps
+    usage: /setwarp <nombre>
+    aliases: [editwarp]
+    permission: etccore.warp.manage
+  delwarp:
+    description: Elimina warps
+    usage: /delwarp <nombre>
+    permission: etccore.warp.manage
+  lobby:
+    description: Teletransporte al lobby
+    usage: /lobby
+    permission: etccore.lobby
+  setlobby:
+    description: Define el lobby
+    usage: /setlobby
+    permission: etccore.lobby.set
+  spawn:
+    description: Teletransporte al spawn
+    usage: /spawn
+    permission: etccore.spawn
+  setspawn:
+    description: Define el spawn
+    usage: /setspawn
+    permission: etccore.spawn.set
+  back:
+    description: Vuelve a tu última ubicación
+    usage: /back
+    permission: etccore.back
+  reborn:
+    description: Vuelve a una de tus últimas muertes
+    usage: /reborn [indice]
+    aliases: [arise, renacer, muerte, death]
+    permission: etccore.reborn
+  deathlist:
+    description: Lista tus últimas muertes guardadas
+    usage: /deathlist
+    aliases: [muertelist, deaths]
+    permission: etccore.reborn
+  rtp:
+    description: Teletransporte aleatorio seguro
+    usage: /rtp
+    permission: etccore.rtp
+  tp:
+    description: Teletransporte administrativo
+    usage: /tp <jugador> [jugador]
+    permission: etccore.tpadmin
+  tpo:
+    description: Teletransporte administrativo directo
+    usage: /tpo <jugador> [jugador]
+    permission: etccore.tpadmin
+  tphere:
+    description: Trae a un jugador hacia ti
+    usage: /tphere <jugador>
+    permission: etccore.tpadmin
+  tpohere:
+    description: Trae a un jugador hacia ti sin restricciones
+    usage: /tpohere <jugador>
+    permission: etccore.tpadmin
+  tpall:
+    description: Teletransporta a todos los jugadores
+    usage: /tpall [jugador]
+    permission: etccore.tpadmin
+  tpoffline:
+    description: Te lleva a la última ubicación offline conocida
+    usage: /tpoffline <jugador>
+    permission: etccore.tpadmin
+  tpa:
+    description: Solicita ir hacia otro jugador
+    usage: /tpa <jugador>
+    permission: etccore.tpa
+  tpahere:
+    description: Solicita que otro jugador vaya hacia ti
+    usage: /tpahere <jugador>
+    permission: etccore.tpa
+  tpaall:
+    description: Solicita a todos que vayan hacia ti
+    usage: /tpaall
+    permission: etccore.tpaall
+  tpaccept:
+    description: Acepta una solicitud de teletransporte
+    usage: /tpaccept [jugador]
+    aliases: [tpyes]
+    permission: etccore.tpa
+  tpdeny:
+    description: Rechaza una solicitud de teletransporte
+    usage: /tpdeny [jugador]
+    aliases: [tpdecline, tpno]
+    permission: etccore.tpa
+  tpignore:
+    description: Ignora solicitudes de teletransporte de un jugador
+    usage: /tpignore <jugador>
+    permission: etccore.tpa
 
 permissions:
   etccore.admin:
@@ -74,5 +194,59 @@ permissions:
     default: op
   etccore.cmdblock.bypass:
     description: Ignora todas las reglas de blocked-commands.yml (admins, staff).
+    default: op
+  etccore.home:
+    description: Permite usar /home, /homes y /homelist.
+    default: true
+  etccore.sethome:
+    description: Permite usar /sethome y /edithome.
+    default: true
+  etccore.delhome:
+    description: Permite usar /delhome.
+    default: true
+  etccore.publichome:
+    description: Permite usar /publichome y /publichomelist.
+    default: true
+  etccore.warp:
+    description: Permite usar /warp, /warps y /warplist.
+    default: true
+  etccore.warp.manage:
+    description: Permite crear, editar y borrar warps.
+    default: op
+  etccore.lobby:
+    description: Permite usar /lobby.
+    default: true
+  etccore.lobby.set:
+    description: Permite definir el lobby.
+    default: op
+  etccore.spawn:
+    description: Permite usar /spawn.
+    default: true
+  etccore.spawn.set:
+    description: Permite definir el spawn.
+    default: op
+  etccore.back:
+    description: Permite volver a la última ubicación guardada.
+    default: true
+  etccore.reborn:
+    description: Permite volver a una muerte guardada y ver la lista.
+    default: true
+  etccore.rtp:
+    description: Permite usar /rtp.
+    default: true
+  etccore.tpa:
+    description: Permite usar solicitudes de teletransporte.
+    default: true
+  etccore.tpaall:
+    description: Permite solicitar a todos que vayan hacia ti.
+    default: op
+  etccore.tpadmin:
+    description: Permite usar /tp, /tpo, /tpall, /tphere, /tpohere y /tpoffline.
+    default: op
+  etccore.teleport.warmup.bypass:
+    description: Ignora los warmups de teletransporte.
+    default: op
+  etccore.teleport.cooldown.bypass:
+    description: Ignora los cooldowns de teletransporte.
     default: op
 

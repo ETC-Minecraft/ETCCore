@@ -1,0 +1,18 @@
+# ============================================================
+#   ETCCore — playtime.yml
+# ============================================================
+
+enabled: true
+
+# Cada cuántos segundos ETCCore sincroniza el tiempo jugado actual a variables.
+sync-interval-seconds: 60
+
+# Prefijo para las variables automáticas en playerdata.
+# Ejemplos resultantes:
+#   playtime.ticks
+#   playtime.seconds
+#   playtime.minutes
+#   playtime.hours
+#   playtime.days
+#   playtime.human
+vars-prefix: "playtime"

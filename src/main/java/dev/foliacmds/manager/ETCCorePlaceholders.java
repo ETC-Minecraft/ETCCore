@@ -50,6 +50,9 @@ public class ETCCorePlaceholders extends PlaceholderExpansion {
         return switch (params.toLowerCase()) {
             case "online" -> String.valueOf(countVisible());
             case "staffonline" -> String.valueOf(countVisibleStaff());
+            case "playtime_ticks" -> player == null ? "0" : String.valueOf(plugin.getPlaytimeManager().getPlaytimeTicks(player));
+            case "playtime_seconds" -> player == null ? "0" : String.valueOf(plugin.getPlaytimeManager().getPlaytimeSeconds(player));
+            case "playtime_human" -> player == null ? "0s" : plugin.getPlaytimeManager().getPlaytimeHuman(player);
             default -> null;
         };
     }

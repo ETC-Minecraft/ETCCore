@@ -1,0 +1,64 @@
+# ============================================================
+#   ETCCore — teleport.yml
+# ============================================================
+
+homes:
+  default-limit: 3
+  public-default-limit: 1
+  group-limits:
+    default:
+      private: 3
+      public: 1
+    vip:
+      private: 6
+      public: 2
+    owner:
+      private: 20
+      public: 8
+
+warmups:
+  home: 3
+  publichome: 3
+  warp: 3
+  lobby: 2
+  spawn: 2
+  back: 0
+  reborn: 0
+  rtp: 5
+  tpa: 3
+  tp-admin: 0
+  cancel-move-distance: 0.15
+  cancel-on-move:
+    home: true
+    publichome: true
+    warp: true
+    lobby: true
+    spawn: true
+    back: false
+    reborn: false
+    rtp: true
+    tpa: true
+    tp-admin: false
+
+cooldowns:
+  home: 0
+  publichome: 0
+  warp: 0
+  lobby: 0
+  spawn: 0
+  back: 10
+  reborn: 10
+  rtp: 60
+  tpa: 0
+  tp-admin: 0
+
+tpa:
+  expire-seconds: 60
+
+deaths:
+  history-limit: 3
+
+rtp:
+  min-radius: 250
+  max-radius: 2500
+  attempts: 16

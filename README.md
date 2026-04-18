@@ -15,6 +15,20 @@ Plugin nativo para **Folia / Paper** que permite crear comandos personalizados d
 2. Colócalo en la carpeta `plugins/` de tu servidor
 3. Inicia el servidor — se generarán automáticamente las carpetas `commands/`, `menus/` y los archivos de configuración con ejemplos
 
+### Archivos de configuración por sistema
+
+ETCCore organiza cada feature en su propio archivo dentro de `plugins/ETCCore/`:
+
+- `config.yml` → opciones generales
+- `on-join.yml` → reglas y acciones al entrar
+- `death-respawn.yml` → respawn y fallback al morir
+- `teleport.yml` → homes, warps, lobby, spawn, back, reborn, tpa y rtp
+- `playtime.yml` → sincronización automática del tiempo jugado a variables
+- `chat-format.yml` → formato del chat
+- `blocked-commands.yml` → comandos bloqueados
+
+Todos se recargan con ` /etccore reload `.
+
 ---
 
 ## Compilar
@@ -201,6 +215,112 @@ etccore.commands.<nombre>
 etccore.menus.<nombre>
 etccore.allow.<comando>
 <permiso-personalizado-definido-en-yaml>
+```
+
+### 8. Permisos del sistema de teletransporte
+
+| Permiso | Uso |
+|---|---|
+| `etccore.home` | `/home`, `/homes`, `/homelist` |
+| `etccore.sethome` | `/sethome`, `/edithome` |
+| `etccore.delhome` | `/delhome` |
+| `etccore.publichome` | `/publichome`, `/publichomelist` |
+| `etccore.warp` | `/warp`, `/warps`, `/warplist` |
+| `etccore.warp.manage` | `/setwarp`, `/editwarp`, `/delwarp` |
+| `etccore.lobby` | `/lobby` |
+| `etccore.lobby.set` | `/setlobby` |
+| `etccore.spawn` | `/spawn` |
+| `etccore.spawn.set` | `/setspawn` |
+| `etccore.back` | `/back` |
+| `etccore.reborn` | `/reborn`, `/deathlist` |
+| `etccore.rtp` | `/rtp` |
+| `etccore.tpa` | `/tpa`, `/tpahere`, `/tpaccept`, `/tpdeny`, `/tpignore` |
+| `etccore.tpaall` | `/tpaall` |
+| `etccore.tpadmin` | `/tp`, `/tpo`, `/tpall`, `/tphere`, `/tpohere`, `/tpoffline` |
+| `etccore.teleport.warmup.bypass` | Ignora warmups |
+| `etccore.teleport.cooldown.bypass` | Ignora cooldowns |
+
+También puedes ampliar límites de homes con permisos como:
+
+```text
+etccore.home.limit.5
+etccore.publichome.limit.2
+```
+
+### Teleports nativos
+
+`teleport.yml` controla el sistema nuevo de teletransporte. Incluye:
+
+- homes privados y públicos
+- warps globales
+- spawn y lobby nativos
+- `/back` separado del historial de muertes
+- `/reborn` y `/deathlist` con un límite configurable de muertes guardadas
+- warmups por tipo de teleport
+- cancelación por movimiento durante warmup
+- cooldowns por tipo de teleport
+- límites por grupo en `teleport.yml`
+- límites por permiso con `etccore.home.limit.X` y `etccore.publichome.limit.X`
+
+Ejemplo:
+
+```yml
+homes:
+	default-limit: 3
+	public-default-limit: 1
+	group-limits:
+		vip:
+			private: 6
+			public: 2
+
+warmups:
+	home: 3
+	warp: 3
+	rtp: 5
+	cancel-move-distance: 0.15
+	cancel-on-move:
+		home: true
+		warp: true
+		back: false
+
+cooldowns:
+	back: 10
+	reborn: 10
+	rtp: 60
+
+deaths:
+	history-limit: 3
+```
+
+### Playtime automático
+
+`playtime.yml` sincroniza el tiempo jugado de cada jugador a variables persistentes para que puedas usarlas en comandos YAML, menús o mensajes.
+
+Variables generadas por defecto:
+
+```text
+{var:playtime.ticks}
+{var:playtime.seconds}
+{var:playtime.minutes}
+{var:playtime.hours}
+{var:playtime.days}
+{var:playtime.human}
+```
+
+Si usas PlaceholderAPI, también quedan disponibles:
+
+```text
+%etccore_playtime_ticks%
+%etccore_playtime_seconds%
+%etccore_playtime_human%
+```
+
+Ejemplo:
+
+```yml
+actions:
+	- "[MESSAGE] &7Llevas &f{var:playtime.human} &7jugados en el servidor."
+	- "[IF var:playtime.hours>=10] [MESSAGE] &aYa desbloqueaste una recompensa por tiempo jugado."
 ```
 
 ---

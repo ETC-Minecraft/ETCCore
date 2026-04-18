@@ -1,0 +1,43 @@
+# ============================================================
+#   ETCCore — death-respawn.yml
+# ============================================================
+
+death-respawn:
+  enabled: false
+  only-groups: []
+  excluded-groups: []
+  only-permissions: []
+  excluded-permissions: []
+  only-worlds: []
+  excluded-worlds: []
+  delay-ticks: 1
+  fallback-actions:
+    - "[CONSOLE] lobby {player}"
+
+respawn-rules:
+  lobby-sin-cama:
+    enabled: true
+    delay-ticks: 1
+    fallback-actions:
+      - "[CONSOLE] lobby {player}"
+
+  default-sin-cama:
+    enabled: false
+    only-groups: ["default"]
+    delay-ticks: 1
+    fallback-actions:
+      - "[MESSAGE] &eNo tenías cama válida, te enviamos al lobby."
+      - "[CONSOLE] lobby {player}"
+
+  hardcore-spawn-fijo:
+    enabled: false
+    only-worlds: ["hardcore"]
+    respawn-location:
+      world: "world"
+      x: 0.5
+      y: 72.0
+      z: 0.5
+      yaw: 0.0
+      pitch: 0.0
+    fallback-actions:
+      - "[FLY:OFF]"

@@ -4,24 +4,31 @@ import dev.foliacmds.command.EnderChestCommand;
 import dev.foliacmds.command.InvSeeCommand;
 import dev.foliacmds.command.MuteCommand;
 import dev.foliacmds.command.ReloadCommand;
+import dev.foliacmds.command.TeleportCommand;
 import dev.foliacmds.command.VanishCommand;
 import dev.foliacmds.manager.VanishManager;
 import dev.foliacmds.listener.BuildProtectionListener;
 import dev.foliacmds.listener.ChatProtectionListener;
 import dev.foliacmds.listener.CommandBlockListener;
 import dev.foliacmds.listener.JoinCommandListener;
+import dev.foliacmds.listener.PlaytimeListener;
+import dev.foliacmds.listener.RespawnListener;
+import dev.foliacmds.listener.TeleportListener;
 import dev.foliacmds.listener.VanishListener;
 import dev.foliacmds.manager.ChatInputManager;
 import dev.foliacmds.manager.CommandBlockManager;
 import dev.foliacmds.manager.CommandLogger;
 import dev.foliacmds.manager.CommandManager;
 import dev.foliacmds.manager.CooldownManager;
+import dev.foliacmds.manager.FeatureConfigManager;
 import dev.foliacmds.manager.FileWatcher;
 import dev.foliacmds.manager.MenuManager;
 import dev.foliacmds.manager.MuteManager;
+import dev.foliacmds.manager.PlaytimeManager;
 import dev.foliacmds.manager.PlayerDataManager;
 import dev.foliacmds.manager.ScheduledTaskManager;
 import dev.foliacmds.manager.ETCCorePlaceholders;
+import dev.foliacmds.manager.TeleportManager;
 import dev.foliacmds.manager.UpdateChecker;
 import dev.foliacmds.manager.VaultManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -40,6 +47,9 @@ public final class FoliaCustomCommands extends JavaPlugin {
     private ChatProtectionListener   chatProtectionListener;
     private FileWatcher              fileWatcher;
     private Thread                   watcherThread;
+    private FeatureConfigManager     featureConfigManager;
+    private TeleportManager          teleportManager;
+    private PlaytimeManager          playtimeManager;
     // ── New managers ────────────────────────────────────────────────────────
     private VaultManager             vaultManager;
     private UpdateChecker            updateChecker;
@@ -51,12 +61,15 @@ public final class FoliaCustomCommands extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
         saveDefaultCommands();
+        featureConfigManager = new FeatureConfigManager(this);
 
         // ── Core managers ────────────────────────────────────────────────────
         vanishManager        = new VanishManager(this);
         vanishManager.startSyncTask();
         cooldownManager      = new CooldownManager();
         playerDataManager    = new PlayerDataManager(this);
+        teleportManager      = new TeleportManager(this);
+        playtimeManager      = new PlaytimeManager(this);
         chatInputManager     = new ChatInputManager(this);
         muteManager          = new MuteManager(this);
         commandBlockManager  = new CommandBlockManager(this);
@@ -71,6 +84,7 @@ public final class FoliaCustomCommands extends JavaPlugin {
         menuManager.loadMenus();
         commandManager.loadCommands();
         scheduledTaskManager.load();
+        playtimeManager.start();
 
         // ── Listeners ────────────────────────────────────────────────────────
         getServer().getPluginManager().registerEvents(menuManager, this);
@@ -84,6 +98,9 @@ public final class FoliaCustomCommands extends JavaPlugin {
         }
 
         getServer().getPluginManager().registerEvents(new JoinCommandListener(this), this);
+        getServer().getPluginManager().registerEvents(new RespawnListener(this), this);
+        getServer().getPluginManager().registerEvents(new TeleportListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlaytimeListener(this), this);
 
         // Vanish: ocultar del MOTD, TAB y manejar eventos de join/quit
         getServer().getPluginManager().registerEvents(new VanishListener(this), this);
@@ -155,6 +172,22 @@ public final class FoliaCustomCommands extends JavaPlugin {
             getServer().getPluginManager().registerEvents(is, this);
         }
 
+        TeleportCommand teleportCommand = new TeleportCommand(this);
+        for (String commandName : new String[]{
+                "home", "sethome", "delhome", "publichome", "publichomelist",
+                "warp", "setwarp", "delwarp", "lobby", "setlobby",
+                "spawn", "setspawn", "back", "reborn", "deathlist",
+                "rtp", "tp", "tpa", "tpahere", "tpaall",
+                "tpaccept", "tpdeny", "tpall", "tphere", "tpignore",
+                "tpo", "tpoffline", "tpohere"
+        }) {
+            var registered = getCommand(commandName);
+            if (registered != null) {
+                registered.setExecutor(teleportCommand);
+                registered.setTabCompleter(teleportCommand);
+            }
+        }
+
         getLogger().info("ETCCore habilitado — "
                 + commandManager.getCommandCount() + " comando(s) cargado(s).");
     }
@@ -191,6 +224,7 @@ public final class FoliaCustomCommands extends JavaPlugin {
     @Override
     public void onDisable() {
         if (scheduledTaskManager != null) scheduledTaskManager.shutdown();
+        if (playtimeManager != null) playtimeManager.shutdown();
         if (fileWatcher != null) fileWatcher.stop();
         if (watcherThread != null) watcherThread.interrupt();
         getLogger().info("ETCCore deshabilitado.");
@@ -198,7 +232,10 @@ public final class FoliaCustomCommands extends JavaPlugin {
 
     public CommandManager          getCommandManager()          { return commandManager; }
     public CooldownManager         getCooldownManager()         { return cooldownManager; }
+    public FeatureConfigManager    getFeatureConfigManager()    { return featureConfigManager; }
     public PlayerDataManager       getPlayerDataManager()       { return playerDataManager; }
+    public TeleportManager         getTeleportManager()         { return teleportManager; }
+    public PlaytimeManager         getPlaytimeManager()         { return playtimeManager; }
     public MenuManager             getMenuManager()             { return menuManager; }
     public ChatInputManager        getChatInputManager()        { return chatInputManager; }
     public MuteManager             getMuteManager()             { return muteManager; }

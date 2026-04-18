@@ -32,6 +32,9 @@ public class ReloadCommand implements CommandExecutor, TabCompleter {
             case "reload" -> {
                 plugin.getServer().getGlobalRegionScheduler().execute(plugin, () -> {
                     plugin.reloadConfig();
+                    plugin.getFeatureConfigManager().reload();
+                    plugin.getTeleportManager().reload();
+                    plugin.getPlaytimeManager().reload();
                     plugin.getCommandManager().reload();
                     plugin.getMenuManager().loadMenus();
                     plugin.getCommandBlockManager().reload();

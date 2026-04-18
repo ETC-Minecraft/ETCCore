@@ -85,7 +85,7 @@ rules:
 # enabled: true  → los grupos listados solo pueden usar lo que tengan en LP.
 #
 allowlist:
-  enabled: false
+  enabled: true
   groups:
     - default
   message: "&cNo tienes permiso para usar ese comando."
