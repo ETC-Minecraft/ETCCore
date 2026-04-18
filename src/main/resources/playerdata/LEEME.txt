@@ -2,7 +2,7 @@
 #   playerdata/ — Carpeta de datos por jugador
 # ============================================================
 #
-# Esta carpeta es generada automáticamente por FoliaCustomCommands.
+# Esta carpeta es generada automáticamente por ETCCore.
 # Aquí se guarda un archivo YAML por cada jugador que use variables
 # en los comandos personalizados del plugin.
 #
