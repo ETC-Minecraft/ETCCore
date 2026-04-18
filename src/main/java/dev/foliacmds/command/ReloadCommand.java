@@ -31,6 +31,7 @@ public class ReloadCommand implements CommandExecutor, TabCompleter {
             // ── /etccore reload ─────────────────────────────────────────────
             case "reload" -> {
                 plugin.getServer().getGlobalRegionScheduler().execute(plugin, () -> {
+                    plugin.reloadConfig();
                     plugin.getCommandManager().reload();
                     plugin.getMenuManager().loadMenus();
                     plugin.getCommandBlockManager().reload();

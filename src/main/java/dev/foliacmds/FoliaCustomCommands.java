@@ -9,6 +9,7 @@ import dev.foliacmds.manager.VanishManager;
 import dev.foliacmds.listener.BuildProtectionListener;
 import dev.foliacmds.listener.ChatProtectionListener;
 import dev.foliacmds.listener.CommandBlockListener;
+import dev.foliacmds.listener.JoinCommandListener;
 import dev.foliacmds.listener.VanishListener;
 import dev.foliacmds.manager.ChatInputManager;
 import dev.foliacmds.manager.CommandBlockManager;
@@ -81,6 +82,8 @@ public final class FoliaCustomCommands extends JavaPlugin {
         if (getConfig().getBoolean("build-protection", true)) {
             getServer().getPluginManager().registerEvents(new BuildProtectionListener(this), this);
         }
+
+        getServer().getPluginManager().registerEvents(new JoinCommandListener(this), this);
 
         // Vanish: ocultar del MOTD, TAB y manejar eventos de join/quit
         getServer().getPluginManager().registerEvents(new VanishListener(this), this);

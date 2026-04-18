@@ -333,6 +333,15 @@ public class CustomCommand extends Command {
             return;
         }
 
+        // [PLAYER] cmd
+        if (action.startsWith("[PLAYER]")) {
+            if (player == null) return;
+            String cmd = action.substring("[PLAYER]".length()).trim();
+            player.getScheduler().execute(plugin,
+                    () -> player.performCommand(cmd), null, 1L);
+            return;
+        }
+
         // [MESSAGE] texto
         if (action.startsWith("[MESSAGE]")) {
             sender.sendMessage(comp(action.substring("[MESSAGE]".length()).trim()));
@@ -354,6 +363,17 @@ public class CustomCommand extends Command {
                 player.getScheduler().execute(plugin,
                         () -> player.sendActionBar(c), null, 1L);
             }
+            return;
+        }
+
+        // [FLY:ON] / [FLY:OFF]
+        if (action.equalsIgnoreCase("[FLY:ON]") || action.equalsIgnoreCase("[FLY:OFF]")) {
+            if (player == null) return;
+            boolean enabled = action.equalsIgnoreCase("[FLY:ON]");
+            player.getScheduler().execute(plugin, () -> {
+                player.setAllowFlight(enabled);
+                player.setFlying(enabled);
+            }, null, 1L);
             return;
         }
 

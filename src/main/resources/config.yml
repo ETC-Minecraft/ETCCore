@@ -1,4 +1,4 @@
-﻿# ============================================================
+# ============================================================
 #   ETCCore — config.yml
 # ============================================================
 #
@@ -7,6 +7,82 @@ verbose-outputs: false
 
 # Recarga automáticamente los archivos de commands/ cuando detecta cambios (default: true)
 auto-reload: true
+
+# ────────────────────────────
+# Acciones al entrar (legacy)
+# ────────────────────────────
+# Formato antiguo, se mantiene por compatibilidad.
+# Si defines join-rules más abajo, usa eso y puedes ignorar esta sección.
+# Usa el mismo formato de acciones que los comandos YAML, por ejemplo:
+#   - "[CONSOLE] lobby {player}"
+#   - "[MESSAGE] &aBienvenido al servidor"
+#
+# only-groups: si se define, solo aplica a jugadores que pertenezcan a
+# alguno de esos grupos de LuckPerms. Ejemplo: ["default"]
+# always-actions: se ejecutan en cada entrada.
+# first-join-actions: se ejecutan solo la primera vez real que el jugador entra.
+on-join:
+  enabled: false
+  only-groups: []
+  always-actions: []
+  first-join-actions:
+    - "[CONSOLE] lobby {player}"
+    - "[MESSAGE] &aBienvenido, esta es tu primera vez en el servidor."
+
+# ────────────────────────────
+# Reglas múltiples al entrar
+# ────────────────────────────
+# Sistema recomendado para definir varias reglas independientes.
+# Puedes combinar grupos, permisos, mundos y frecuencia de ejecución.
+#
+# Campos opcionales por regla:
+#   enabled: true/false
+#   only-groups: ["default", "vip"]
+#   excluded-groups: ["staff"]
+#   only-permissions: ["grupo.terricolas"]
+#   excluded-permissions: ["etccore.admin"]
+#   only-worlds: ["world"]
+#   excluded-worlds: ["eventos"]
+#   cooldown-seconds: 300     # no vuelve a correr hasta pasados 300s
+#   once-per-day: true        # se ejecuta como máximo una vez al día por jugador
+#   delay-ticks: 20           # retrasa la ejecución 20 ticks
+#   always-actions: []        # siempre que entra y cumpla filtros/frecuencia
+#   first-join-actions: []    # solo la primera vez real que entra
+join-rules:
+  default-lobby:
+    enabled: true
+    only-groups: ["default"]
+    always-actions:
+      - "[CONSOLE] lobby {player}"
+    first-join-actions:
+      - "[MESSAGE] &aBienvenido Ente, esta es tu primera vez en el servidor."
+
+  terricolas-pan:
+    enabled: true
+    only-groups: ["terricolas"]
+    cooldown-seconds: 30
+    always-actions:
+      - "[CONSOLE] give {player} bread 1"
+    first-join-actions: []
+
+  kit-diario-default:
+    enabled: false
+    only-groups: ["default"]
+    once-per-day: true
+    delay-ticks: 40
+    always-actions:
+      - "[MESSAGE] &eTu recompensa diaria ha sido entregada."
+      - "[CONSOLE] give {player} apple 3"
+    first-join-actions: []
+
+  vip-spawn:
+    enabled: false
+    only-groups: ["vip", "vip+"]
+    excluded-groups: ["staff"]
+    only-worlds: ["world"]
+    always-actions:
+      - "[CONSOLE] spawn {player}"
+    first-join-actions: []
 
 # ────────────────────────────
 # Update checker
