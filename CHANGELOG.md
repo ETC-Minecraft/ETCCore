@@ -36,7 +36,7 @@ Este proyecto sigue [Semantic Versioning](https://semver.org/spec/v2.0.0.html) y
 - Cooldowns globales y por jugador
 - Condiciones por mundo, salud y variables
 - Completado automático con `arg-types`
-- Protección de construcción (`fccmds.build`) y de ítems (`fccmds.items`)
+- Protección de construcción (`etccore.build`) y de ítems (`etccore.items`)
 - Bloqueo de comandos por grupo LP desde `blocked-commands.yml`
 - Formato de chat con prefijo/sufijo LuckPerms y PlaceholderAPI desde `chat-format.yml`
 - Sistema de mute temporal y permanente con `/mute` y `/unmute`
