@@ -468,6 +468,32 @@ public class CustomCommand extends Command {
             return; // handled by MenuManager's click handler; no-op here
         }
 
+        // [WORLD] nombreMundo  — teleporta al jugador a un mundo (usa ETCWorlds si está instalado)
+        // Ejemplo: [WORLD] lobby        |  [WORLD] skyblock_main
+        if (action.startsWith("[WORLD]")) {
+            if (player == null) return;
+            String worldName = action.substring("[WORLD]".length()).trim();
+            player.getScheduler().execute(plugin,
+                    () -> player.performCommand("world " + worldName), null, 1L);
+            return;
+        }
+
+        // [SPAWN]  — teleporta al jugador al spawn de su mundo actual
+        if (action.equalsIgnoreCase("[SPAWN]")) {
+            if (player == null) return;
+            player.getScheduler().execute(plugin,
+                    () -> player.performCommand("spawn"), null, 1L);
+            return;
+        }
+
+        // [LOBBY]  — teleporta al jugador al mundo lobby configurado
+        if (action.equalsIgnoreCase("[LOBBY]")) {
+            if (player == null) return;
+            player.getScheduler().execute(plugin,
+                    () -> player.performCommand("lobby"), null, 1L);
+            return;
+        }
+
         // Sin prefijo → el jugador ejecuta el comando
         if (player != null) {
             player.getScheduler().execute(plugin,
