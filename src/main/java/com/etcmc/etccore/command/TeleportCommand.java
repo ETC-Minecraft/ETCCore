@@ -36,9 +36,9 @@ public class TeleportCommand implements CommandExecutor, TabCompleter {
             case "warp" -> handleWarp(sender, args);
             case "setwarp" -> handleSetWarp(sender, label, args);
             case "delwarp" -> handleDelWarp(sender, args);
-            case "lobby" -> handleNamedTeleport(sender, "lobby");
+            case "lobby" -> handleNamedTeleport(sender, "lobby", args);
             case "setlobby" -> handleSetNamed(sender, "lobby");
-            case "spawn" -> handleNamedTeleport(sender, "spawn");
+            case "spawn" -> handleNamedTeleport(sender, "spawn", args);
             case "setspawn" -> handleSetNamed(sender, "spawn");
             case "back" -> handleBack(sender);
             case "reborn" -> handleReborn(sender, args);
@@ -261,7 +261,36 @@ public class TeleportCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
-    private boolean handleNamedTeleport(CommandSender sender, String key) {
+    private boolean handleNamedTeleport(CommandSender sender, String key, String[] args) {
+        // Si la consola (o cualquier sender no-Player) lo ejecuta, exigir <jugador>.
+        // Tambien permite que un jugador con permiso .others mande a otro: /lobby <jugador>.
+        if (args.length >= 1) {
+            if (sender instanceof Player executor
+                    && !executor.hasPermission("etccore." + key + ".others")
+                    && !executor.hasPermission("etccore.teleport.others")) {
+                executor.sendMessage("\u00a7cNo tienes permiso para enviar a otros jugadores.");
+                return true;
+            }
+            Player target = org.bukkit.Bukkit.getPlayerExact(args[0]);
+            if (target == null) {
+                sender.sendMessage("\u00a7cJugador no encontrado: " + args[0]);
+                return true;
+            }
+            Location location = plugin.getTeleportManager().getNamedLocation(key);
+            if (location == null) {
+                if (key.equals("spawn")) {
+                    location = target.getWorld().getSpawnLocation();
+                } else {
+                    sender.sendMessage("\u00a7cNo hay " + key + " configurado todav\u00eda.");
+                    return true;
+                }
+            }
+            teleport(target, location, "\u00a7aTeleportado a \u00a7f" + key + "\u00a7a.",
+                    key.equals("lobby") ? TeleportManager.TeleportType.LOBBY : TeleportManager.TeleportType.SPAWN, false);
+            if (sender != target) sender.sendMessage("\u00a7aEnviado " + target.getName() + " a " + key + ".");
+            return true;
+        }
+
         Player player = requirePlayer(sender);
         if (player == null) {
             return true;
@@ -595,7 +624,8 @@ public class TeleportCommand implements CommandExecutor, TabCompleter {
             case "publichome" -> completePublicHome(args);
             case "publichomelist" -> args.length == 1 ? onlineNames() : List.of();
             case "warp", "setwarp", "delwarp" -> completeWarps(args, name.equals("setwarp"));
-            case "tpa", "tpahere", "tpignore", "tp", "tpo", "tphere", "tpohere", "tpall", "tpaall", "tpaccept", "tpdeny" -> onlineNames(args);
+            case "tpa", "tpahere", "tpignore", "tphere", "tpohere", "tpall", "tpaall", "tpaccept", "tpdeny" -> onlineNames(args);
+            case "tp", "tpo" -> onlineNamesUpTo(args, 2);
             case "tpoffline" -> List.of();
             case "reborn" -> completeDeathIndexes(sender, args);
             default -> List.of();
@@ -653,6 +683,14 @@ public class TeleportCommand implements CommandExecutor, TabCompleter {
             return List.of();
         }
         return filter(onlineNames(), args[0]);
+    }
+
+    /** Tab-complete de jugadores online para los primeros {@code maxArg} args. */
+    private List<String> onlineNamesUpTo(String[] args, int maxArg) {
+        if (args.length < 1 || args.length > maxArg) {
+            return List.of();
+        }
+        return filter(onlineNames(), args[args.length - 1]);
     }
 
     private List<String> onlineNames() {
