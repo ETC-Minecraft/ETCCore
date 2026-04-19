@@ -154,11 +154,7 @@ commands:
     description: Ignora solicitudes de teletransporte de un jugador
     usage: /tpignore <jugador>
     permission: etccore.tpa
-  menu:
-    description: Abre el menú principal del servidor
-    usage: /menu [submenu]
-    aliases: [m, etcmenu, menus]
-    permission: etccore.menu
+  # /menu se registra dinamicamente desde commands/menu.yml
 
 permissions:
   etccore.admin:

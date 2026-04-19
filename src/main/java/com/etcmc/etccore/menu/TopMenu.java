@@ -67,7 +67,7 @@ public class TopMenu extends EtcMenu {
 
     @Override
     public void onClick(int slot, ClickType click, ItemStack current) {
-        if (slot == 45) new MainMenu(plugin, player).open();
+        if (slot == 45) plugin.getMenuManager().openMenu(player, "menu");
         else if (slot == 48) new TopMenu(plugin, player, page - 1).open();
         else if (slot == 49) player.closeInventory();
         else if (slot == 50) new TopMenu(plugin, player, page + 1).open();

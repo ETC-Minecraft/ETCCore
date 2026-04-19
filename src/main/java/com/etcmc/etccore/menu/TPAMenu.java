@@ -62,7 +62,7 @@ public class TPAMenu extends EtcMenu {
 
     @Override
     public void onClick(int slot, ClickType click, ItemStack current) {
-        if (slot == 40) { new MainMenu(plugin, player).open(); return; }
+        if (slot == 40) { plugin.getMenuManager().openMenu(player, "menu"); return; }
         if (reqs == null) return;
 
         for (int i = 0; i < SLOTS.length; i++) {

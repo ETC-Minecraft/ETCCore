@@ -32,7 +32,6 @@ import com.etcmc.etccore.manager.TeleportManager;
 import com.etcmc.etccore.manager.UpdateChecker;
 import com.etcmc.etccore.manager.VaultManager;
 import com.etcmc.etccore.bridge.ETCWorldsBridge;
-import com.etcmc.etccore.command.MenuCommand;
 import com.etcmc.etccore.listener.PVPListener;
 import com.etcmc.etccore.menu.MenuListener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -112,14 +111,10 @@ public final class ETCCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new VanishListener(this), this);
 
         // ── Menú personalizado + PvP toggle ──────────────────────────────────
+        // El comando /menu se define ahora en commands/menu.yml (editable).
+        // Solo registramos el listener de clicks de los submenus dinamicos.
         getServer().getPluginManager().registerEvents(new MenuListener(), this);
         getServer().getPluginManager().registerEvents(new PVPListener(this), this);
-        var menuCmd = getCommand("menu");
-        if (menuCmd != null) {
-            MenuCommand mc = new MenuCommand(this);
-            menuCmd.setExecutor(mc);
-            menuCmd.setTabCompleter(mc);
-        }
 
         var vanishCmd = getCommand("vanish");
         if (vanishCmd != null) {

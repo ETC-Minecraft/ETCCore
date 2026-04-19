@@ -1,0 +1,23 @@
+# ============================================================
+#   Comando /menu  (definido en YAML, editable)
+# ============================================================
+#
+# Abre el menu principal del servidor. El menu en si esta definido
+# en menus/menu.yml — editalo libremente para cambiar items, layout,
+# permisos por item, etc.
+#
+# Aliases: /m  /etcmenu  /menus
+#
+# Recarga: /etccore reload
+# ============================================================
+
+commands:
+
+  menu:
+    description: "Abre el menu principal del servidor"
+    aliases: [m, etcmenu, menus]
+    permission: ""
+    no-permission-message: "&cNo tienes permiso para usar este comando."
+    console-allowed: false
+    actions:
+      - "[MENU] menu"

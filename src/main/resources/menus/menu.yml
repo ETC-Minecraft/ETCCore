@@ -1,0 +1,181 @@
+# ============================================================
+#   Menu principal — menu.yml
+# ============================================================
+#
+# Se abre con /menu (definido en commands/menu.yml).
+#
+# Cada item puede ejecutar cualquier accion estandar de ETCCore:
+#   [CONSOLE] cmd        [PLAYER] cmd        [MESSAGE] texto
+#   [MENU] otro_menu     [SOUND] NOMBRE      [TITLE] titulo;sub
+#   [PAPI] %placeholder%
+#
+# Ademas, los SUBMENUS DINAMICOS internos se abren con:
+#   [ETCMENU] mundos        — lista de mundos visibles (paginada)
+#   [ETCMENU] pocketworlds  — propio + invitados
+#   [ETCMENU] homes         — homes con LMB=tp, RMB=mover, Q=borrar
+#   [ETCMENU] warps         — warps publicos
+#   [ETCMENU] tpa           — solicitudes TPA pendientes
+#   [ETCMENU] stats         — estadisticas del jugador
+#   [ETCMENU] top           — top jugadores por playtime
+#   [ETCMENU] pvp           — toggle PvP personal (sin GUI)
+#
+# Estos submenus son dinamicos (datos en tiempo real) y NO son YAML.
+# Recarga: /etccore reload
+# ============================================================
+
+title: "&8\u00bb &b&lMen\u00fa Principal"
+rows: 4
+permission: "etccore.menu"
+
+items:
+
+  # ── Borde superior ──────────────────────────────────────────
+  0:  { material: GRAY_STAINED_GLASS_PANE, name: " " }
+  1:  { material: GRAY_STAINED_GLASS_PANE, name: " " }
+  2:  { material: GRAY_STAINED_GLASS_PANE, name: " " }
+  3:  { material: GRAY_STAINED_GLASS_PANE, name: " " }
+  4:  { material: GRAY_STAINED_GLASS_PANE, name: " " }
+  5:  { material: GRAY_STAINED_GLASS_PANE, name: " " }
+  6:  { material: GRAY_STAINED_GLASS_PANE, name: " " }
+  7:  { material: GRAY_STAINED_GLASS_PANE, name: " " }
+  8:  { material: GRAY_STAINED_GLASS_PANE, name: " " }
+  9:  { material: GRAY_STAINED_GLASS_PANE, name: " " }
+  17: { material: GRAY_STAINED_GLASS_PANE, name: " " }
+  18: { material: GRAY_STAINED_GLASS_PANE, name: " " }
+  26: { material: GRAY_STAINED_GLASS_PANE, name: " " }
+  27: { material: GRAY_STAINED_GLASS_PANE, name: " " }
+  28: { material: GRAY_STAINED_GLASS_PANE, name: " " }
+  29: { material: GRAY_STAINED_GLASS_PANE, name: " " }
+  30: { material: GRAY_STAINED_GLASS_PANE, name: " " }
+  32: { material: GRAY_STAINED_GLASS_PANE, name: " " }
+  33: { material: GRAY_STAINED_GLASS_PANE, name: " " }
+  34: { material: GRAY_STAINED_GLASS_PANE, name: " " }
+
+  # ══════════════════════════════════════════════════════════
+  #  FILA 1 — Mundos / PocketWorlds / PvP / Homes
+  # ══════════════════════════════════════════════════════════
+
+  10:
+    material: GRASS_BLOCK
+    name: "&a&lMundos"
+    lore:
+      - "&7Lista de mundos del servidor."
+      - "&7Filtrados por permisos y visibilidad."
+      - ""
+      - "&eClick &7para abrir."
+    glow: true
+    close-on-click: false
+    actions:
+      - "[ETCMENU] mundos"
+
+  12:
+    material: ENDER_PEARL
+    name: "&d&lPocketWorlds"
+    lore:
+      - "&7Tu mundo personal y los"
+      - "&7que te han invitado."
+      - ""
+      - "&eClick &7para abrir."
+    glow: true
+    close-on-click: false
+    actions:
+      - "[ETCMENU] pocketworlds"
+
+  14:
+    material: IRON_SWORD
+    name: "&c&lPvP"
+    lore:
+      - "&7Activa o desactiva el PvP"
+      - "&7entre jugadores para tu cuenta."
+      - ""
+      - "&eClick &7para alternar."
+    close-on-click: true
+    actions:
+      - "[ETCMENU] pvp"
+      - "[SOUND] UI_BUTTON_CLICK"
+
+  16:
+    material: RED_BED
+    name: "&6&lHomes"
+    lore:
+      - "&7Tus puntos guardados."
+      - ""
+      - "&eClick &7para abrir."
+    glow: true
+    close-on-click: false
+    actions:
+      - "[ETCMENU] homes"
+
+  # ══════════════════════════════════════════════════════════
+  #  FILA 2 — Warps / TPA / Stats / Top
+  # ══════════════════════════════════════════════════════════
+
+  19:
+    material: COMPASS
+    name: "&b&lWarps"
+    lore:
+      - "&7Puntos publicos del servidor."
+      - ""
+      - "&eClick &7para abrir."
+    glow: true
+    close-on-click: false
+    actions:
+      - "[ETCMENU] warps"
+
+  21:
+    material: ENDER_EYE
+    name: "&d&lSolicitudes TPA"
+    lore:
+      - "&7Acepta o rechaza solicitudes"
+      - "&7de teletransporte pendientes."
+      - ""
+      - "&eClick &7para abrir."
+    glow: true
+    close-on-click: false
+    actions:
+      - "[ETCMENU] tpa"
+
+  23:
+    material: BOOK
+    name: "&e&lEstadisticas"
+    lore:
+      - "&7Tu playtime, homes, balance"
+      - "&7y mas."
+      - ""
+      - "&eClick &7para ver."
+    glow: true
+    close-on-click: false
+    actions:
+      - "[ETCMENU] stats"
+
+  25:
+    material: GOLDEN_HELMET
+    name: "&6&lTop Jugadores"
+    lore:
+      - "&7Ranking por tiempo jugado."
+      - ""
+      - "&eClick &7para ver."
+    glow: true
+    close-on-click: false
+    actions:
+      - "[ETCMENU] top"
+
+  # ══════════════════════════════════════════════════════════
+  #  FILA 3 — Misiones (placeholder) + Cerrar
+  # ══════════════════════════════════════════════════════════
+
+  31:
+    material: WRITTEN_BOOK
+    name: "&a&lMisiones"
+    lore:
+      - "&8&oProximamente..."
+    close-on-click: false
+    actions:
+      - "[MESSAGE] &7Las misiones llegaran pronto."
+
+  35:
+    material: BARRIER
+    name: "&c&lCerrar"
+    close-on-click: true
+    actions:
+      - "[CLOSE]"

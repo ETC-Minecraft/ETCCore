@@ -56,6 +56,6 @@ public class StatsMenu extends EtcMenu {
 
     @Override
     public void onClick(int slot, ClickType click, ItemStack current) {
-        if (slot == 22) new MainMenu(plugin, player).open();
+        if (slot == 22) plugin.getMenuManager().openMenu(player, "menu");
     }
 }

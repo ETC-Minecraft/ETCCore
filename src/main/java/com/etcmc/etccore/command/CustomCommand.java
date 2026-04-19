@@ -37,6 +37,8 @@ import java.util.Map;
  *   [VAR:DEL] nombre           → Elimina una variable
  *   [INPUT] variable;prompt    → Pide texto al jugador (captura siguiente mensaje)
  *   [MENU] nombre              → Abre un menú definido en menus/<nombre>.yml
+ *   [ETCMENU] tipo             → Abre un submenú dinámico interno (mundos, pocketworlds,
+ *                                 homes, warps, tpa, stats, top, pvp). Datos en tiempo real.
  *   [PAPI] texto con %placeholder%  → Reemplaza PlaceholderAPI si está instalado
  *
  * === CONDICIONES PARA [IF] ===
@@ -321,6 +323,14 @@ public class CustomCommand extends Command {
             if (player == null) return;
             String menuName = action.substring("[MENU]".length()).trim();
             plugin.getMenuManager().openMenu(player, menuName);
+            return;
+        }
+
+        // [ETCMENU] tipo  -> abre un submenu dinámico interno
+        if (action.startsWith("[ETCMENU]")) {
+            if (player == null) return;
+            String type = action.substring("[ETCMENU]".length()).trim().toLowerCase();
+            com.etcmc.etccore.menu.EtcMenuOpener.open(plugin, player, type);
             return;
         }
 

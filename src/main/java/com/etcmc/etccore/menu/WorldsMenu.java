@@ -85,7 +85,7 @@ public class WorldsMenu extends EtcMenu {
 
     @Override
     public void onClick(int slot, ClickType click, ItemStack current) {
-        if (slot == 45) { new MainMenu(plugin, player).open(); return; }
+        if (slot == 45) { plugin.getMenuManager().openMenu(player, "menu"); return; }
         if (slot == 48) { new WorldsMenu(plugin, player, page - 1).open(); return; }
         if (slot == 49) { player.closeInventory(); return; }
         if (slot == 50) { new WorldsMenu(plugin, player, page + 1).open(); return; }
