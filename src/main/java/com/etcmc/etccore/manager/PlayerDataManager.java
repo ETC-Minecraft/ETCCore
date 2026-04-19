@@ -64,6 +64,29 @@ public class PlayerDataManager {
     }
 
     // -------------------------------------------------------------------------
+    // Helpers tipados
+    // -------------------------------------------------------------------------
+    /** Devuelve un boolean con valor por defecto si la variable no existe. */
+    public boolean getBool(UUID uuid, String variable, boolean def) {
+        String v = get(uuid, variable);
+        if (v == null || v.isEmpty()) return def;
+        return Boolean.parseBoolean(v);
+    }
+
+    /** Guarda un boolean directamente (sin pasar por evalSimpleMath). */
+    public void setBool(UUID uuid, String variable, boolean value) {
+        load(uuid).put(variable.toLowerCase(), Boolean.toString(value));
+        saveAsync(uuid);
+    }
+
+    /** Toggle: invierte el valor actual y devuelve el nuevo. */
+    public boolean toggleBool(UUID uuid, String variable, boolean defaultIfMissing) {
+        boolean newValue = !getBool(uuid, variable, defaultIfMissing);
+        setBool(uuid, variable, newValue);
+        return newValue;
+    }
+
+    // -------------------------------------------------------------------------
     // Evaluación de expresiones simples con {var:x}
     // -------------------------------------------------------------------------
     private String resolveExpression(UUID uuid, String expr) {

@@ -6,7 +6,7 @@ folia-supported: true
 description: Plugin base para servidores Minecraft — comandos YAML, GUIs, variables, protección, mute y más.
 author: EmmanuelTC
 website: https://github.com/ETC-Minecraft/ETCCore
-soft-depend: [LuckPerms, PlaceholderAPI, Vault, floodgate]
+soft-depend: [LuckPerms, PlaceholderAPI, Vault, floodgate, ETCWorlds]
 
 commands:
   etccore:
@@ -154,10 +154,21 @@ commands:
     description: Ignora solicitudes de teletransporte de un jugador
     usage: /tpignore <jugador>
     permission: etccore.tpa
+  menu:
+    description: Abre el menú principal del servidor
+    usage: /menu [submenu]
+    aliases: [m, etcmenu, menus]
+    permission: etccore.menu
 
 permissions:
   etccore.admin:
     description: Permite recargar la configuración del plugin
+    default: op
+  etccore.menu:
+    description: Permite abrir el menú principal con /menu
+    default: true
+  etccore.menu.bypass:
+    description: Ve mundos y pocketworlds aunque estén marcados como ocultos o privados
     default: op
   etccore.staff:
     description: Marca al jugador como staff. Usado por %etccore_staffonline% de PlaceholderAPI.
