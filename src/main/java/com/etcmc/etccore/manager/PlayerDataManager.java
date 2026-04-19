@@ -138,17 +138,25 @@ public class PlayerDataManager {
     }
 
     private void saveAsync(UUID uuid) {
-        plugin.getServer().getAsyncScheduler().runNow(plugin, t -> {
-            ConcurrentHashMap<String, String> map = cache.get(uuid);
-            if (map == null) return;
-            YamlConfiguration cfg = new YamlConfiguration();
-            map.forEach((k, v) -> cfg.set("vars." + k, v));
-            try {
-                cfg.save(fileFor(uuid));
-            } catch (IOException e) {
-                plugin.getLogger().warning("Error guardando datos de " + uuid + ": " + e.getMessage());
-            }
-        });
+        if (!plugin.isEnabled()) {
+            // El plugin ya está deshabilitado: el scheduler rechazaría la tarea.
+            // Guardamos en el hilo actual (shutdown thread de Folia).
+            saveSync(uuid);
+            return;
+        }
+        plugin.getServer().getAsyncScheduler().runNow(plugin, t -> saveSync(uuid));
+    }
+
+    private void saveSync(UUID uuid) {
+        ConcurrentHashMap<String, String> map = cache.get(uuid);
+        if (map == null) return;
+        YamlConfiguration cfg = new YamlConfiguration();
+        map.forEach((k, v) -> cfg.set("vars." + k, v));
+        try {
+            cfg.save(fileFor(uuid));
+        } catch (IOException e) {
+            plugin.getLogger().warning("Error guardando datos de " + uuid + ": " + e.getMessage());
+        }
     }
 
     private File fileFor(UUID uuid) {
