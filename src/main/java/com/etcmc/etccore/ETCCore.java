@@ -209,6 +209,11 @@ public final class ETCCore extends JavaPlugin {
             commandsDir.mkdirs();
             saveResource("commands/survival.yml", false);
             saveResource("commands/inicio.yml", false);
+            saveResource("commands/menu.yml", false);
+        } else {
+            // menu.yml se añadió después: copiarlo si no existe todavía
+            File menuCmd = new File(commandsDir, "menu.yml");
+            if (!menuCmd.exists()) saveResource("commands/menu.yml", false);
         }
 
         // Create scheduled folder with example if it doesn't exist
@@ -223,6 +228,11 @@ public final class ETCCore extends JavaPlugin {
             menusDir.mkdirs();
             saveResource("menus/panel.yml", false);
             saveResource("menus/tienda.yml", false);
+            saveResource("menus/menu.yml", false);
+        } else {
+            // menu.yml se añadió después: copiarlo si no existe todavía
+            File menuYml = new File(menusDir, "menu.yml");
+            if (!menuYml.exists()) saveResource("menus/menu.yml", false);
         }
 
         File playerDataDir = new File(getDataFolder(), "playerdata");
